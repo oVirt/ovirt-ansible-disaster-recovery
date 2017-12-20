@@ -1,0 +1,33 @@
+- name: Fetch unregistered Templates from storage domain
+  ovirt_storage_templates_facts:
+      nested_attributes: "id"
+      unregistered: True
+      storage_domain: "{{ storage.name }}"
+      auth: "{{ ovirt_auth }}"
+
+- name: Register unregistered Template
+  ovirt_templates:
+      state: registered
+      storage_domain: "{{ storage.name }}"
+      id: "{{ unreg_template.id }}"
+      allow_partial_import: "{{ dr_partial_import }}"
+      auth: "{{ ovirt_auth }}"
+      cluster_mappings: "{{ dr_cluster_map }}"
+      domain_mappings: "{{ dr_domain_map }}"
+      vnic_profile_mappings:  "{{ dr_network_map }}"
+      role_mappings: "{{ dr_role_map }}"
+
+      # TODO: We should set a flag
+      # - fail: msg="The execution has failed because of errors."
+      #  when: flag == "failed"
+      #
+      #  - name: Set flag
+      #  set_fact: flag = failed
+      #  when: "'FAILED' in command_result.stderr"
+  # The main task already declared ignore errors so that might bredundant to put it here
+  # ignore_errors: "{{ ignore | default(yes) }}"
+  with_items: "{{ ovirt_storage_templates }}"
+  # We use loop_control so storage.name will not be overriden by the nested loop.
+  loop_control:
+      loop_var: unreg_template
+

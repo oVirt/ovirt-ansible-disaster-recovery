@@ -1,0 +1,5 @@
+- name: update OVF store for storage domain
+  ovirt_storage_domains:
+      state: update_ovf_store
+      name: "{{ storage.name }}"
+      auth: "{{ ovirt_auth }}"

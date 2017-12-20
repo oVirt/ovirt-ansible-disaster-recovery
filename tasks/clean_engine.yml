@@ -1,0 +1,117 @@
+- block:
+    - name: Obtain SSO token
+      ovirt_auth:
+          url: "{{ vars['dr_sites_' + dr_source_map + '_url'] }}"
+          username: "{{ vars['dr_sites_' + dr_source_map + '_username'] }}"
+          password: "{{ vars['dr_sites_' + dr_source_map + '_password'] }}"
+          ca_file: "{{ vars['dr_sites_' + dr_source_map + '_ca_file'] }}"
+
+    # Get all the running VMs and shut them down
+    - name: Fetch VMs in the setup
+      ovirt_vms_facts:
+          pattern:  status != down
+          auth: "{{ ovirt_auth }}"
+
+    - include_tasks: tasks/clean/shutdown_vms.yml vms={{ item }}
+      with_items: "{{ ovirt_vms }}"
+
+    - name: Update OVF_STORE disks for active storage domain
+      ovirt_storage_domains_facts:
+          pattern:  status = active and type != glance
+          auth: "{{ ovirt_auth }}"
+
+    - include_tasks: tasks/clean/update_ovf_store.yml storage={{ item }}
+      with_items:
+          - "{{ ovirt_storage_domains }}"
+
+    # We do not supoport export storage domain
+    # TODO: Export storage domain should be handled by an independant task which will clean the meta data.
+    # We first remove all the non master storage domain.
+    - name: Fetch valid storage domains for detach
+      ovirt_storage_domains_facts:
+          pattern:  status = active or status = maintenance or status = unattached and type != glance
+          auth: "{{ ovirt_auth }}"
+
+    - name: Set force remove flag to false
+      set_fact: dr_force=False
+
+    - include_tasks: tasks/clean/remove_domain_process.yml storage={{ item }}
+      with_items:
+          - "{{ ovirt_storage_domains }}"
+      when: "not item.master"
+
+    # We use inactive filter only at the end, since we are not sure if there were any storage domains
+    # which became inactive on the process or if there were any on the beginning.
+    - name: Fetch invalid storage domains to remove
+      ovirt_storage_domains_facts:
+          # TODO: Should check also about Cinder
+          pattern: status != active and type != glance
+          auth: "{{ ovirt_auth }}"
+
+    - name: Set force remove flag to true
+      set_fact: dr_force=True
+
+    - include_tasks: tasks/clean/remove_domain_process.yml storage={{ item }}
+      with_items:
+          - "{{ ovirt_storage_domains }}"
+      when: "not item.master"
+
+    # Try to remove the master storage domains, if we fail we will try later to force remove all
+    # inactive master domains.
+    - name: Fetch valid storage domains for detach master
+      ovirt_storage_domains_facts:
+          pattern:  status = active or status = maintenance
+          auth: "{{ ovirt_auth }}"
+
+    - name: Set force remove flag to false
+      set_fact: dr_force=False
+
+    - include_tasks: tasks/clean/remove_domain_process.yml storage={{ item }}
+      with_items:
+          - "{{ ovirt_storage_domains }}"
+      when: "item.master"
+
+    # If by any chance the master storage domain is inactive we force remove it.
+    - name: Set force remove flag to true
+      set_fact: dr_force=True
+
+    - name: Fetch invalid storage domains to remove master
+      ovirt_storage_domains_facts:
+          pattern: status != active and type != glance
+          auth: "{{ ovirt_auth }}"
+
+    - include_tasks: tasks/clean/remove_domain_process.yml storage={{ item }}
+      with_items:
+          - "{{ ovirt_storage_domains }}"
+
+    - name: Fetch leftover storage domains
+      ovirt_storage_domains_facts:
+          pattern: type != glance
+          auth: "{{ ovirt_auth }}"
+
+    # Remove direct LUN disks
+    - name: Fetch leftover direct LUN disks in the setup
+      ovirt_disk_facts:
+          pattern: alias != OVF_STORE
+          auth: "{{ ovirt_auth }}"
+
+    - include_tasks: tasks/clean/remove_disks.yml disk={{ item }}
+      with_items: "{{ ovirt_disks }}"
+
+    # Remove VMs without disks only if there are no data storage domains left in the setup
+    - name: Fetch leftover VMs in the setup
+      ovirt_vms_facts:
+          auth: "{{ ovirt_auth }}"
+      when: "ovirt_storage_domains | length == 0"
+
+    - include_tasks: tasks/clean/remove_vms.yml vm={{ item }}
+      with_items: "{{ ovirt_vms }}"
+
+  # Default value is set in role defaults
+  ignore_errors: "{{ dr_ignore_error_clean }}"
+- always:
+    - name: Revoke the SSO token
+      ovirt_auth:
+          state: absent
+          ovirt_auth: "{{ ovirt_auth }}"
+

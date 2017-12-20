@@ -1,0 +1,9 @@
+- name: Add Gluster storage domain
+  ovirt_storage_domains:
+      name: "{{ gluster_storage['dr_' + dr_target_host + '_name'] }}"
+      host: "{{ ovirt_hosts[0].name }}"
+      data_center: "{{ gluster_storage['dr_' + dr_target_host + '_dc_name'] }}"
+      auth: "{{ ovirt_auth }}"
+      glusterfs:
+          path: "{{ gluster_storage['dr_' + dr_target_host + '_path'] }}"
+          address: "{{ gluster_storage['dr_' + dr_target_host + '_address'] }}"

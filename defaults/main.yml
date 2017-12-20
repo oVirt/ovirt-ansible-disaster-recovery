@@ -1,0 +1,14 @@
+# Indicate whether to ignore errors on clean engine setup.
+dr_ignore_error_clean: "False"
+
+# Indicate whether to ignore errors on recover.
+dr_ignore_error_recover: "True"
+
+# Indicate whether to use the partial import flag when registering VMs and Templates.
+dr_partial_import: "True"
+
+# Indicate the default target host to be used in the play.
+dr_target_host: "primary"
+
+# Indicate the default source map to be used in the play.
+dr_source_map: "secondary"

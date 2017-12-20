@@ -1,0 +1,10 @@
+- name: Add posix storage domain
+  ovirt_storage_domains:
+      name: "{{ posix_storage['dr_' + dr_target_host + '_name'] }}"
+      host: "{{ ovirt_hosts[0].name }}"
+      data_center: "{{ posix_storage['dr_' + dr_target_host + '_dc_name'] }}"
+      auth: "{{ ovirt_auth }}"
+      posixfs:
+          path: "{{ posix_storage['dr_' + dr_target_host + '_path'] }}"
+          address: "{{ posix_storage['dr_' + dr_target_host + '_address'] }}"
+

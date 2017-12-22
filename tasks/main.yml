@@ -21,3 +21,7 @@
     - include_tasks: run_unregistered_entities.yml
       tags:
           - fail_back
+
+    - include_tasks: generate_mapping.yml
+      tags:
+          - generate_mapping

@@ -1,6 +1,9 @@
 - name: Add posix storage domain
   ovirt_storage_domains:
       name: "{{ posix_storage['dr_' + dr_target_host + '_name'] }}"
+      critical_space_action_blocker: "{{ posix_storage['dr_critical_space_action_blocker'] }}"
+      discard_after_delete: "{{ posix_storage['dr_discard_after_delete'] }}"
+      backup: "{{ posix_storage['dr_backup'] }}"
       host: "{{ ovirt_hosts[0].name }}"
       data_center: "{{ posix_storage['dr_' + dr_target_host + '_dc_name'] }}"
       auth: "{{ ovirt_auth }}"

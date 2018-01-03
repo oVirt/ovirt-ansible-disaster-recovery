@@ -1,6 +1,9 @@
 - name: Add Gluster storage domain
   ovirt_storage_domains:
       name: "{{ gluster_storage['dr_' + dr_target_host + '_name'] }}"
+      critical_space_action_blocker: "{{ gluster_storage['dr_critical_space_action_blocker'] }}"
+      discard_after_delete: "{{ gluster_storage['dr_discard_after_delete'] }}"
+      backup: "{{ gluster_storage['dr_backup'] }}"
       host: "{{ ovirt_hosts[0].name }}"
       data_center: "{{ gluster_storage['dr_' + dr_target_host + '_dc_name'] }}"
       auth: "{{ ovirt_auth }}"

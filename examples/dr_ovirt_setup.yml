@@ -6,4 +6,4 @@
      - ovirt_passwords.yml
      - disaster_recovery_vars.yml
   roles:
-     - {role: ovirt-disaster-recovery}
+     - oVirt.disaster-recovery

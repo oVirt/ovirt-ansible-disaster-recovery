@@ -1,3 +1,6 @@
+*retry
 .tox
-*.retry
-roles/provision_docker
+*.tar.gz
+output/
+ovirt-ansible-disaster-recovery.spec
+exported-artifacts/

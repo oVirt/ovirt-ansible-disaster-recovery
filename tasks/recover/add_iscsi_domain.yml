@@ -1,0 +1,44 @@
+# TODO: Add support for connect to multiple targets with the same LUN.
+# Every connect should be done using a different ip
+- name: Login to iSCSI targets
+  ovirt_hosts:
+      state: iscsilogin
+      name: "{{ ovirt_hosts[0].name }}"
+      auth: "{{ ovirt_auth }}"
+      iscsi:
+          username: "{{ iscsi_storage['dr_' + dr_target_host + '_username']|default('') }}"
+          password: "{{ iscsi_storage['dr_' + dr_target_host + '_password']|default('') }}"
+          address: "{{ iscsi_storage['dr_' + dr_target_host + '_address'] }}"
+          target: "{{ dr_target }}"
+          # Make port to be optional
+          port: "{{ iscsi_storage['dr_' + dr_target_host + '_port']|default('') }}"
+  with_items:
+     - "{{ iscsi_storage['dr_' + dr_target_host + '_target'] }}"
+  loop_control:
+     loop_var: dr_target
+
+- name: Import iSCSI storage domain
+  ovirt_storage_domains:
+      state: imported
+      id: "{{ iscsi_storage['dr_domain_id'] }}"
+      name: "{{ iscsi_storage['dr_' + dr_target_host + '_name']|default('') }}"
+      host: "{{ ovirt_hosts[0].name }}"
+      auth: "{{ ovirt_auth }}"
+      data_center: "{{ iscsi_storage['dr_' + dr_target_host + '_dc_name'] }}"
+      # TODO: For import iSCSI there is no need for the iscsi parameters
+      iscsi:
+          username: "{{ iscsi_storage['dr_' + dr_target_host + '_username']|default('') }}"
+          password: "{{ iscsi_storage['dr_' + dr_target_host + '_password']|default('') }}"
+          address: "{{ iscsi_storage['dr_' + dr_target_host + '_address'] }}"
+          critical_space_action_blocker: "{{ iscsi_storage['dr_critical_space_action_blocker'] }}"
+          wipe_after_delete: "{{ iscsi_storage['dr_wipe_after_delete'] }}"
+          discard_after_delete: "{{ iscsi_storage['dr_discard_after_delete'] }}"
+          backup: "{{ iscsi_storage['dr_backup'] }}"
+          # We use target since state imported in ovirt_storage_domains.py creates a storage domain
+          # which calls login, therfore we must have a target althout the targets were already connected before.
+          # Therefore passing the first target in the list as a transient target.
+          target: "{{ dr_target }}"
+  with_items:
+     - "{{ iscsi_storage['dr_' + dr_target_host + '_target'] }}"
+  loop_control:
+     loop_var: dr_target

@@ -1,0 +1,12 @@
+- name: Add NFS storage domain
+  ovirt_storage_domains:
+      name: "{{ nfs_storage['dr_' + dr_target_host + '_name'] }}"
+      critical_space_action_blocker: "{{ nfs_storage['dr_critical_space_action_blocker'] }}"
+      wipe_after_delete: "{{ nfs_storage['dr_wipe_after_delete'] }}"
+      backup: "{{ nfs_storage['dr_backup'] }}"
+      host: "{{ ovirt_hosts[0].name }}"
+      data_center: "{{ nfs_storage['dr_' + dr_target_host + '_dc_name'] }}"
+      auth: "{{ ovirt_auth }}"
+      nfs:
+          path: "{{ nfs_storage['dr_' + dr_target_host + '_path'] }}"
+          address: "{{ nfs_storage['dr_' + dr_target_host + '_address'] }}"

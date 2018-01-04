@@ -1,0 +1,25 @@
+- block:
+    - name: Obtain SSO token
+      ovirt_auth:
+          url: "{{ vars['dr_sites_' + dr_source_map + '_url'] }}"
+          username: "{{ vars['dr_sites_' + dr_source_map + '_username'] }}"
+          password: "{{ vars['dr_sites_' + dr_source_map + '_password'] }}"
+          ca_file: "{{ vars['dr_sites_' + dr_source_map + '_ca_file'] }}"
+
+    # Get all the running VMs and shut them down
+    - name: Fetch running VMs in the setup
+      ovirt_vms_facts:
+          pattern:  status = up
+          auth: "{{ ovirt_auth }}"
+
+    # TODO: Should be written to a file
+    - name: Define running VMs
+      set_fact: running_vms_fail_back="{{ ovirt_vms }}"
+
+  ignore_errors: "{{ dr_ignore_error_clean }}"
+- always:
+    - name: Revoke the SSO token
+      ovirt_auth:
+          state: absent
+          ovirt_auth: "{{ ovirt_auth }}"
+

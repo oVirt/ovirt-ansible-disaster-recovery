@@ -1,0 +1,8 @@
+- name: Shutdown VMs
+  ovirt_vms:
+      state: stopped
+      name: "{{ vms.name }}"
+      force: True
+      wait: False
+      auth: "{{ ovirt_auth }}"
+

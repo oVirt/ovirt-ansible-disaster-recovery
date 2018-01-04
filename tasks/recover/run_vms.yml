@@ -1,0 +1,6 @@
+- name: Run VMs
+  ovirt_vms:
+      state: running
+      name: "{{ vms.name }}"
+      wait: False
+      auth: "{{ ovirt_auth }}"

@@ -1,0 +1,51 @@
+# TODO: Add to the documentation:
+# On each operation we fetch a running host for the transaction and not using any
+# pre-fetched default host since the each operation might have a different DC.
+- set_fact:
+    storage_name: "{{ storage.name }}"
+
+- name: Fetch active host in data center
+  ovirt_hosts_facts:
+      pattern: "status=up and datacenter={{ storage.DC_name }}"
+      auth: "{{ ovirt_auth }}"
+
+- name: Login to iSCSI targets
+  ovirt_hosts:
+      state: iscsilogin
+      name: "{{ ovirt_hosts[0].name }}"
+      auth: "{{ ovirt_auth }}"
+      iscsi:
+          username: "{{ storage.username }}"
+          password: "{{ storage.password }}"
+          address: "{{ storage.address }}"
+          target: "{{ scsi_target }}"
+          # Make port to be optional
+          port: "{{  storage.port }}"
+  with_items:
+     - "{{ storage.target }}"
+  loop_control:
+     loop_var: scsi_target
+
+- name: Import block storage domain
+  ovirt_storage_domains:
+      state: imported
+      id: "{{ storage.id }}"
+      name: "{{ storage.name }}"
+      host: "{{ ovirt_hosts[0].name }}"
+      auth: "{{ ovirt_auth }}"
+      data_center: "{{ storage.DC_name }}"
+      # TODO: For import block there is no need for the iscsi parameters
+      iscsi:
+          username: "{{ storage,username }}"
+          password: "{{ storage.password }}"
+          address: "{{ storage.address }}"
+          # We use target since state imported in ovirt_storage_domains.py creates a storage domain
+          # which calls login, therfore we must have a target althout the targets were already connected before.
+          # Therefore passing the first target in the list as a transient target.
+          target: "{{ scsi_target }}"
+  with_items:
+     - "{{ storage.target }}"
+  loop_control:
+     loop_var: scsi_target
+
+

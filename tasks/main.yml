@@ -1,0 +1,27 @@
+- block:
+    - include_tasks: unregister_entities.yml
+      tags:
+          - fail_back
+
+    - include_tasks: clean_engine.yml
+      tags:
+          - fail_back
+          - clean_engine
+
+    - pause:
+          prompt: "Please update once the destination storage domains are ready to be used for recovery"
+      tags:
+          - fail_back
+
+    - include_tasks: recover_engine.yml
+      tags:
+          - fail_over
+          - fail_back
+
+    - include_tasks: run_unregistered_entities.yml
+      tags:
+          - fail_back
+
+    - include_tasks: generate_mapping.yml
+      tags:
+          - generate_mapping

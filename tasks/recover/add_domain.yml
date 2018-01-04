@@ -1,0 +1,38 @@
+- ovirt_hosts_facts:
+      pattern: "status=up and datacenter={{ storage['dr_' + dr_target_host + '_dc_name'] }}"
+      auth: "{{ ovirt_auth }}"
+
+- include_tasks: tasks/recover/add_nfs_domain.yml
+  with_items:
+    - "{{ storage }}"
+  when: "storage.dr_domain_type == 'nfs'"
+  loop_control:
+      loop_var: nfs_storage
+
+- include_tasks: tasks/recover/add_glusterfs_domain.yml
+  with_items:
+    - "{{ storage }}"
+  when: "storage.dr_domain_type == 'gluster'"
+  loop_control:
+      loop_var: gluster_storage
+
+- include_tasks: tasks/recover/add_posixfs_domain.yml
+  with_items:
+    - "{{ storage }}"
+  when: "storage.dr_domain_type == 'posixfs'"
+  loop_control:
+      loop_var: posix_storage
+
+- include_tasks: tasks/recover/add_iscsi_domain.yml
+  with_items:
+    - "{{ storage }}"
+  when: "storage.dr_domain_type == 'iscsi'"
+  loop_control:
+      loop_var: iscsi_storage
+
+- include_tasks: tasks/recover/add_fcp_domain.yml
+  with_items:
+    - "{{ storage }}"
+  when: "storage.dr_domain_type == 'fcp'"
+  loop_control:
+      loop_var: fcp_storage

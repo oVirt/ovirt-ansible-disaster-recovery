@@ -1,0 +1,5 @@
+- name: Remove disk
+  ovirt_disks:
+      state: absent
+      id: "{{ disk.id }}"
+      auth: "{{ ovirt_auth }}"

@@ -5,6 +5,7 @@
           username: "{{ vars['dr_sites_' + dr_target_host + '_username'] }}"
           password: "{{ vars['dr_sites_' + dr_target_host + '_password'] }}"
           ca_file: "{{ vars['dr_sites_' + dr_target_host + '_ca_file'] }}"
+      ignore_errors: False
 
     # TODO: We should add a validation task that will validate whether
     # all the hosts in the other site (primary or secondary) could not be connected

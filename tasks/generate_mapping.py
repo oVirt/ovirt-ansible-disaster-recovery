@@ -354,7 +354,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
                         portal = splitted[1]
                 f.write("  primary_logical_unit_address: %s\n"
                         "  primary_logical_unit_port: %s\n"
-                        "  primary_logical_unit_portal: %s\n"
+                        "  primary_logical_unit_portal: \"%s\"\n"
                         "  primary_logical_unit_target: %s\n"
                         % (disk_storage.address,
                            disk_storage.port,

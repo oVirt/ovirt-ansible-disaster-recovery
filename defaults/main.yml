@@ -12,3 +12,6 @@ dr_target_host: "primary"
 
 # Indicate the default source map to be used in the play.
 dr_source_map: "secondary"
+
+# Indicate whether to reset a mac pool of a VM on register.
+dr_reset_mac_pool: "True"

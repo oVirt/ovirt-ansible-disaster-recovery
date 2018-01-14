@@ -15,3 +15,9 @@ dr_source_map: "secondary"
 
 # Indicate whether to reset a mac pool of a VM on register.
 dr_reset_mac_pool: "True"
+
+# Indicate the number of retries of moving a storage domain to maintenance (In case of a failure because of running tasks).
+dr_cleanup_retries_maintenance: 3
+
+# Indicate the number of seconds between each maintenance retry (In case of a failure because of running tasks).
+dr_cleanup_delay_maintenance: 120

@@ -132,7 +132,7 @@ def _get_host_storages_for_external_lun_disks(connection):
     # be a Host which fail to connect to a certain device but still be active.
     for host in hosts_list:
         host_storages_service = hosts_service.host_service(host.id) \
-                                .storage_service().list()
+            .storage_service().list()
         for host_storage in host_storages_service:
             if host_storage.id not in host_storages.keys():
                 host_storages[host_storage.id] = host_storage
@@ -220,10 +220,8 @@ def _write_attached_storage_domains(f, dc_service, dc):
         f.write("  dr_critical_space_action_blocker: %s\n"
                 % attached_sd.critical_space_action_blocker)
         f.write("  dr_primary_dc_name: %s\n" % dc.name)
-        if (
-            not isinstance(attached_sd.storage.type, types.StorageType.FCP) and
-            not isinstance(attached_sd.storage.type, types.StorageType.ISCSI)
-        ):
+        if (not attached_sd._storage.type == types.StorageType.FCP and
+                not attached_sd.storage.type == types.StorageType.ISCSI):
             f.write("  dr_discard_after_delete: %s\n"
                     % attached_sd.discard_after_delete)
             f.write("  dr_primary_path: %s\n" % attached_sd.storage.path)
@@ -231,7 +229,7 @@ def _write_attached_storage_domains(f, dc_service, dc):
             _add_secondary_mount(f)
         else:
             f.write("  dr_domain_id: %s\n" % attached_sd.id)
-            if isinstance(attached_sd._storage._type, types.StorageType.ISCSI):
+            if attached_sd._storage._type == types.StorageType.ISCSI:
                 f.write("  dr_primary_address: %s\n" %
                         attached_sd.storage.volume_group
                         .logical_units[0].address)
@@ -348,7 +346,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
             disk_storage_type = host_storages.get(disk_id).type
             disk_storage = host_storages.get(disk_id).logical_units[0]
             f.write("  primary_storage_type: %s\n" % disk_storage_type)
-            if isinstance(disk_storage_type, types.StorageType.ISCSI):
+            if disk_storage_type == types.StorageType.ISCSI:
                 portal = ''
                 if disk_storage.portal is not None:
                     splitted = disk_storage.portal.split(',')
@@ -379,7 +377,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
             )
         )
         f.write("  secondary_logical_unit_id: \n")
-        if isinstance(disk_storage_type, types.StorageType.ISCSI):
+        if disk_storage_type == types.StorageType.ISCSI:
             f.write("  secondary_logical_unit_address: \n"
                     "  secondary_logical_unit_port: \n"
                     "  secondary_logical_unit_portal: \n"

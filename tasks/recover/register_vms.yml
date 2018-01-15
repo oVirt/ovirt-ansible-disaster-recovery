@@ -24,6 +24,7 @@
       affinity_label_mappings: "{{ dr_affinity_label_map }}"
       vnic_profile_mappings:  "{{ dr_network_map }}"
       lun_mappings: "{{ dr_lun_map }}"
+      reassign_bad_macs: "{{ dr_reset_mac_pool }}"
 
   # The main task already declared ignore errors so that might be redundant to put it here
   # ignore_errors: "{{ ignore | default(yes) }}"

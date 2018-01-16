@@ -40,6 +40,7 @@ install() {
   mkdir -p $PKG_DOC_DIR
 
   cp -pR defaults/ $PKG_DATA_DIR
+  cp -pR library/ $PKG_DATA_DIR
   cp -pR meta/ $PKG_DATA_DIR
   cp -pR tasks/ $PKG_DATA_DIR
 

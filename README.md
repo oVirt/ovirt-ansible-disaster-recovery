@@ -20,6 +20,9 @@ Role Variables
 | dr_target_host          | primary               | Specify the default target host to be used in the ansible play.<br/> This hos indicates the target site which the recover process will bedone.      |
 | dr_source_map           | secondary             | Specify the default source map to be used in the play.</br/> The source map indicates the key which is used to get the target value for each attribute which we want to register with the VM/Template.       |
 | dr_reset_mac_pool       | True                  | If true, then once a VM will be registered, it will automatically reset the mac pool, if configured in the VM.        |
+| dr_cleanup_retries_maintenance       | 3                  | Specify the number of retries of moving a storage domain to maintenace VM as part of a fail back scenario.       |
+| dr_cleanup_delay_maintenance       | 120                  | Specify the number of seconds between each retry as part of a fail back scenario.       |
+
 
 Dependencies
 ------------

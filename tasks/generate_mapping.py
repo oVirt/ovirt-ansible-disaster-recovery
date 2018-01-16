@@ -235,11 +235,11 @@ def _write_attached_storage_domains(f, dc_service, dc):
                 f.write("  dr_primary_address: %s\n" %
                         attached_sd.storage.volume_group
                         .logical_units[0].address)
-                targets = ''
+                targets = set(lun_unit.target for lun_unit in
+                              attached_sd.storage.volume_group.logical_units)
                 f.write("  dr_primary_target: [%s]\n" %
-                        ','.join(['"' + lun_unit.target + '"' for
-                                  lun_unit in attached_sd.
-                                  storage.volume_group.logical_units]))
+                        ','.join(['"' + target + '"' for
+                                  target in targets]))
                 _add_secondary_scsi(f)
             else:
                 _add_secondary_fcp(f)
@@ -356,7 +356,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
                         portal = splitted[1]
                 f.write("  primary_logical_unit_address: %s\n"
                         "  primary_logical_unit_port: %s\n"
-                        "  primary_logical_unit_portal: %s\n"
+                        "  primary_logical_unit_portal: \"%s\"\n"
                         "  primary_logical_unit_target: %s\n"
                         % (disk_storage.address,
                            disk_storage.port,

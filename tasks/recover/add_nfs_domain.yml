@@ -2,6 +2,7 @@
   ovirt_storage_domains:
       name: "{{ nfs_storage['dr_' + dr_target_host + '_name'] }}"
       critical_space_action_blocker: "{{ nfs_storage['dr_critical_space_action_blocker'] }}"
+      warning_low_space: "{{ nfs_storage['dr_warning_low_space'] }}"
       wipe_after_delete: "{{ nfs_storage['dr_wipe_after_delete'] }}"
       backup: "{{ nfs_storage['dr_backup'] }}"
       host: "{{ ovirt_hosts[0].name }}"

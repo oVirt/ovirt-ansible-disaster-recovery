@@ -3,13 +3,13 @@
 - name: Remove storage domain
   ovirt_storage_domains:
       state: absent
-      id: "{{ storage.id }}"
-      name: "{{ storage.name }}"
+      id: "{{ sd.id }}"
+      name: "{{ sd.name }}"
       auth: "{{ ovirt_auth }}"
       host: "{{ host }}"
       destroy: "{{ dr_force }}"
       data_center: "{{ sp_uuid }}"
   register: result
-  until: not result|failed
+  until: dr_force or result is not failed
   retries: "{{ dr_cleanup_retries_maintenance }}"
   delay: "{{ dr_cleanup_delay_maintenance }}"

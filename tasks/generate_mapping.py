@@ -235,6 +235,9 @@ def _write_attached_storage_domains(f, dc_service, dc):
                 f.write("  dr_primary_address: %s\n" %
                         attached_sd.storage.volume_group
                         .logical_units[0].address)
+                f.write("  dr_primary_port: %s\n" %
+                        attached_sd.storage.volume_group
+                        .logical_units[0].port)
                 targets = set(lun_unit.target for lun_unit in
                               attached_sd.storage.volume_group.logical_units)
                 f.write("  dr_primary_target: [%s]\n" %
@@ -261,6 +264,7 @@ def _add_secondary_scsi(f):
     f.write("  dr_secondary_dc_name: \n")
     f.write("  dr_secondary_name: \n")
     f.write("  dr_secondary_address: \n")
+    f.write("  dr_secondary_port: \n")
     f.write("  # target example: [\"target1\",\"target2\",\"target3\"]\n")
     f.write("  dr_secondary_target: \n")
 

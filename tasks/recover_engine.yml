@@ -11,6 +11,8 @@
       set_fact:
         failed_vm_names: []
         succeed_vm_names: []
+        failed_template_names: []
+        succeed_template_names: []
 
     # TODO: We should add a validation task that will validate whether
     # all the hosts in the other site (primary or secondary) could not be connected

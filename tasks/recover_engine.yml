@@ -13,8 +13,11 @@
         succeed_vm_names: []
         failed_template_names: []
         succeed_template_names: []
+<<<<<<< HEAD
         failed_to_run_vms: []
         succeed_to_run_vms: []
+=======
+>>>>>>> Add appropriate logs to template registeration
 
     # TODO: We should add a validation task that will validate whether
     # all the hosts in the other site (primary or secondary) could not be connected

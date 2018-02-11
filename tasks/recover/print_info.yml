@@ -1,0 +1,9 @@
+- name: Print info about registered VMs
+  debug:
+    msg: "The following VMs registered successfully:  {{ succeed_vm_names | unique  }}"
+  when: succeed_vm_names | length > 0
+
+- name: Print info about VMs that were not registered
+  debug:
+    msg: "The Following VMs failed to be registered: {{ failed_vm_names | unique  }}"
+  when: failed_vm_names | length > 0

@@ -1,3 +1,3 @@
 - name: Generate mapping var file
-  command: python tasks/generate_mapping.py -a "{{ site }}" -u "{{ username }}" -p "{{ password }}" -c "{{ ca }}" -f "{{ var_file }}"
+  command: python {{ role_path }}/tasks/generate_mapping.py -a "{{ site }}" -u "{{ username }}" -p "{{ password }}" -c "{{ ca }}" -f "{{ var_file }}"
   run_once: true

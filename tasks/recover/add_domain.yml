@@ -16,7 +16,7 @@
   - include_tasks: tasks/recover/add_glusterfs_domain.yml
     with_items:
       - "{{ storage }}"
-    when: "storage.dr_domain_type == 'gluster'"
+    when: "storage.dr_domain_type == 'glusterfs'"
     loop_control:
         loop_var: gluster_storage
 

@@ -8,10 +8,10 @@ dr_ignore_error_recover: "True"
 dr_partial_import: "True"
 
 # Indicate the default target host to be used in the play.
-dr_target_host: "primary"
+dr_target_host: "secondary"
 
 # Indicate the default source map to be used in the play.
-dr_source_map: "secondary"
+dr_source_map: "primary"
 
 # Indicate whether to reset a mac pool of a VM on register.
 dr_reset_mac_pool: "True"

@@ -17,3 +17,13 @@
   debug:
     msg: "The following Templates failed to be registered: {{ failed_template_names | unique  }}"
   when: failed_template_names | length > 0
+
+- name: Print info about VMs which failed to run
+  fail:
+    msg: "The following VMs failed to run: {{ failed_to_run_vms | unique  }}"
+  when: failed_to_run_vms | length > 0
+
+- name: Print info about VMs which started successfully
+  debug:
+    msg: "The following VMs started successfully: {{ succeed_to_run_vms | unique  }}"
+  when: succeed_to_run_vms | length > 0

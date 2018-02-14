@@ -14,10 +14,15 @@
         failed_template_names: []
         succeed_template_names: []
 <<<<<<< HEAD
+<<<<<<< HEAD
         failed_to_run_vms: []
         succeed_to_run_vms: []
 =======
 >>>>>>> Add appropriate logs to template registeration
+=======
+        failed_to_run_vms: []
+        succeed_to_run_vms: []
+>>>>>>> Add report about VMs that started/failed to start
 
     # TODO: We should add a validation task that will validate whether
     # all the hosts in the other site (primary or secondary) could not be connected

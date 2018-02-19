@@ -1,13 +1,21 @@
-- name: Add NFS storage domain
-  ovirt_storage_domains:
-      name: "{{ nfs_storage['dr_' + dr_target_host + '_name'] }}"
-      critical_space_action_blocker: "{{ nfs_storage['dr_critical_space_action_blocker'] }}"
-      warning_low_space: "{{ nfs_storage['dr_warning_low_space'] }}"
-      wipe_after_delete: "{{ nfs_storage['dr_wipe_after_delete'] }}"
-      backup: "{{ nfs_storage['dr_backup'] }}"
-      host: "{{ ovirt_hosts[0].name }}"
-      data_center: "{{ nfs_storage['dr_' + dr_target_host + '_dc_name'] }}"
-      auth: "{{ ovirt_auth }}"
-      nfs:
-          path: "{{ nfs_storage['dr_' + dr_target_host + '_path'] }}"
-          address: "{{ nfs_storage['dr_' + dr_target_host + '_address'] }}"
+- block:
+  - name: Add NFS storage domain
+    ovirt_storage_domains:
+        name: "{{ nfs_storage['dr_' + dr_target_host + '_name'] }}"
+        critical_space_action_blocker: "{{ nfs_storage['dr_critical_space_action_blocker'] }}"
+        wipe_after_delete: "{{ nfs_storage['dr_wipe_after_delete'] }}"
+        backup: "{{ nfs_storage['dr_backup'] }}"
+        host: "{{ ovirt_hosts[0].name }}"
+        data_center: "{{ nfs_storage['dr_' + dr_target_host + '_dc_name'] }}"
+        auth: "{{ ovirt_auth }}"
+        nfs:
+            path: "{{ nfs_storage['dr_' + dr_target_host + '_path'] }}"
+            address: "{{ nfs_storage['dr_' + dr_target_host + '_address'] }}"
+  - name: append to failed storage domains
+    set_fact:
+      succeed_storage_domains: "{{ succeed_storage_domains }} + [ \"{{ nfs_storage['dr_' + dr_target_host + '_name'] }}\" ]"
+
+  rescue:
+  - name: append to failed_storage_domains
+    set_fact:
+      failed_storage_domains: "{{ failed_storage_domains }} + [ \"{{ nfs_storage['dr_' + dr_target_host + '_name'] }}\" ]"

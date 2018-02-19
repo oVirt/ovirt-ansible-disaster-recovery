@@ -27,3 +27,13 @@
   debug:
     msg: "The following VMs started successfully: {{ succeed_to_run_vms | unique  }}"
   when: succeed_to_run_vms | length > 0
+
+- name: Print info about storage domains that failed to attach
+  debug:
+    msg: "The following storage domains were not added: {{ failed_storage_domains | unique }}"
+  when: failed_storage_domains | length > 0
+
+- name: Print info about storage domains that registered successfully
+  debug:
+    msg: "The following storage domains were successfully added: {{ succeed_storage_domains | unique }}"
+  when: succeed_storage_domains | length > 0

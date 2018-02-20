@@ -37,5 +37,10 @@ sh build.sh install
 %license LICENSE
 
 %changelog
-* Thu Jan 4 2018 Ondra Machacek <omachace@redhat.com> - 1.1.0-1
+* Tue Feb 20 2018 Ondra Machacek <omachace@redhat.com> - 0.2-1
+- Add discard after delete to block storage domains when generate mapping.
+- Support cleanup of mapped storage domain.
+- Master storage domain should be configured for each setup.
+
+* Thu Jan 4 2018 Ondra Machacek <omachace@redhat.com> - 0.1-1
 - Initial release

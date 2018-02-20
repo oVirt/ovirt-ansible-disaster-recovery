@@ -8,24 +8,24 @@
 
 - name: Detached storage domain - Set sp_uuid with empty GUID
   set_fact: sp_uuid="00000000-0000-0000-0000-000000000000"
-  when: storage.data_centers is not defined
+  when: sd.data_centers is not defined
 
 - name: Detached storage domain - Fetch active host for remove
   ovirt_hosts_facts:
     pattern: "status=up"
     auth: "{{ ovirt_auth }}"
-  when: storage.data_centers is not defined
+  when: sd.data_centers is not defined
 
 - name: Attached storage domain - Fetch active host for remove
   ovirt_hosts_facts:
-    pattern: "status=up and storage={{ storage.name }}"
+    pattern: "status=up and storage={{ sd.name }}"
     auth: "{{ ovirt_auth }}"
-  when: storage.data_centers is defined
+  when: sd.data_centers is defined
 
 # If sp_uuid is still initiated with the default boolean value,
 # that means that there is a data center which the storage domain is attached to it.
 - name: Attached storage domain - Set sp_uuid
-  set_fact: sp_uuid="{{ storage.data_centers[0].id }}"
+  set_fact: sp_uuid="{{ sd.data_centers[0].id }}"
   when: sp_uuid
 
 - name: Remove storage domain with no force
@@ -34,6 +34,5 @@
 
 - name: Force remove storage domain
   include_tasks: tasks/clean/remove_domain.yml host="00000000-0000-0000-0000-000000000000"
-  #storage={{ storage }} host={{ ovirt_hosts[0] }} sp_uuid=sp_uuid
-  when: "force"
+  when: "dr_force"
 

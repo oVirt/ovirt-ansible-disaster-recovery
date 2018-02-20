@@ -22,6 +22,8 @@ Role Variables
 | dr_reset_mac_pool       | True                  | If true, then once a VM will be registered, it will automatically reset the mac pool, if configured in the VM.        |
 | dr_cleanup_retries_maintenance       | 3                  | Specify the number of retries of moving a storage domain to maintenace VM as part of a fail back scenario.       |
 | dr_cleanup_delay_maintenance       | 120                  | Specify the number of seconds between each retry as part of a fail back scenario.       |
+| dr_clean_orphaned_vms:       | True                  | Specify whether to remove any VMs which have no disks from the setup as part of cleanup.       |
+| dr_clean_orphaned_disks:       | True                  | Specify whether to remove lun disks from the setup as part of engine setup.       |
 
 
 Dependencies

@@ -21,3 +21,9 @@ dr_cleanup_retries_maintenance: 3
 
 # Indicate the number of seconds between each maintenance retry (In case of a failure because of running tasks).
 dr_cleanup_delay_maintenance: 120
+
+# Indicate whether to remove any VMs which have no disks from the setup as part of cleanup.
+dr_clean_orphaned_vms: "True"
+
+# Indicate whether to remove lun disks from the setup as part of engine setup.
+dr_clean_orphaned_disks: "True"

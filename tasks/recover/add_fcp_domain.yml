@@ -12,3 +12,14 @@
       auth: "{{ ovirt_auth }}"
       data_center: "{{ fcp_storage['dr_' + dr_target_host + '_dc_name'] }}"
       fcp: {}
+  register: result
+
+- name: Append to succeed_storage_domains
+  set_fact:
+    succeed_storage_domains: "{{ succeed_storage_domains }} + [ \"{{ fcp_storage['dr_' + dr_target_host + '_name']|default('') }}\" ]"
+  when: result is succeeded
+
+- name: Append to failed_storage_domains
+  set_fact:
+    failed_storage_domains: "{{ failed_storage_domains }} + [ \"{{ fcp_storage['dr_' + dr_target_host + '_name']|default('') }}\" ]"
+  when: result is failed

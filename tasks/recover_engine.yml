@@ -15,6 +15,8 @@
         succeed_template_names: []
         failed_to_run_vms: []
         succeed_to_run_vms: []
+        succeed_storage_domains: []
+        failed_storage_domains: []
 
     # TODO: We should add a validation task that will validate whether
     # all the hosts in the other site (primary or secondary) could not be connected

@@ -20,12 +20,12 @@
     - include_tasks: tasks/recover/add_domain.yml storage={{ item }}
       with_items:
         - "{{ dr_import_storages }}"
-      when: "item.dr_master_domain"
+      when: item['dr_' + dr_target_host + '_master_domain']
 
     - include_tasks: tasks/recover/add_domain.yml storage={{ item }}
       with_items:
         - "{{ dr_import_storages }}"
-      when: "not item.dr_master_domain"
+      when: not item['dr_' + dr_target_host + '_master_domain']
 
     # Get all the active storage domains in the setup to register
     # all the templates/VMs/Disks

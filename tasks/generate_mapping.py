@@ -213,7 +213,7 @@ def _write_attached_storage_domains(f, dc_service, dc):
     for attached_sd in attached_sds_list:
         f.write("- dr_domain_type: %s\n" % attached_sd.storage.type)
         f.write("  dr_primary_name: %s\n" % attached_sd.name)
-        f.write("  dr_master_domain: %s\n" % attached_sd.master)
+        f.write("  dr_primary_master_domain: %s\n" % attached_sd.master)
         f.write("  dr_wipe_after_delete: %s\n"
                 % attached_sd.wipe_after_delete)
         f.write("  dr_backup: %s\n" % attached_sd.backup)
@@ -256,6 +256,7 @@ def _add_secondary_mount(f):
     f.write("  dr_secondary_path: \n")
     f.write("  dr_secondary_address: \n")
     f.write("  dr_secondary_name: \n")
+    f.write("  dr_secondary_master_domain: \n")
 
 
 def _add_secondary_scsi(f):
@@ -267,6 +268,7 @@ def _add_secondary_scsi(f):
     f.write("  dr_secondary_port: \n")
     f.write("  # target example: [\"target1\",\"target2\",\"target3\"]\n")
     f.write("  dr_secondary_target: \n")
+    f.write("  dr_secondary_master_domain: \n")
 
 
 def _add_secondary_fcp(f):
@@ -274,6 +276,7 @@ def _add_secondary_fcp(f):
             "related to the secondary site\n")
     f.write("  dr_secondary_dc_name: \n")
     f.write("  dr_secondary_name: \n")
+    f.write("  dr_secondary_master_domain: \n")
 
 
 def _write_clusters(f, clusters):

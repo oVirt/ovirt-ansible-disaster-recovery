@@ -7,6 +7,17 @@
           ca_file: "{{ vars['dr_sites_' + dr_target_host + '_ca_file'] }}"
       ignore_errors: False
 
+    - name: Init entity status list
+      set_fact:
+        failed_vm_names: []
+        succeed_vm_names: []
+        failed_template_names: []
+        succeed_template_names: []
+        failed_to_run_vms: []
+        succeed_to_run_vms: []
+        succeed_storage_domains: []
+        failed_storage_domains: []
+
     # TODO: We should add a validation task that will validate whether
     # all the hosts in the other site (primary or secondary) could not be connected
     # and also set a timer that will wait at least 180 seconds until the first
@@ -158,6 +169,7 @@
   ignore_errors: "{{ dr_ignore_error_recover }}"
 
 - always:
+     - include_tasks: tasks/recover/print_info.yml
      - name: Revoke the SSO token
        ovirt_auth:
            state: absent

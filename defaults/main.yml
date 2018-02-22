@@ -27,3 +27,6 @@ dr_clean_orphaned_vms: "True"
 
 # Indicate whether to remove lun disks from the setup as part of engine setup.
 dr_clean_orphaned_disks: "True"
+
+# Indiciate the entities status report file name
+dr_report_file: "report.log"

@@ -1,39 +1,7 @@
-- name: Print info about registered VMs
-  debug:
-    msg: "The following VMs registered successfully:  {{ succeed_vm_names | unique  }}"
-  when: succeed_vm_names | length > 0
+- name:
+  template:
+    src: report_log_template.j2
+    dest: files/{{ dr_report_file }}
 
-- name: Print info about VMs that were not registered
-  debug:
-    msg: "The Following VMs failed to be registered: {{ failed_vm_names | unique  }}"
-  when: failed_vm_names | length > 0
-
-- name: Print info about registered Templates
-  debug:
-    msg: "The following Templates registered successfully: {{ succeed_template_names | unique  }}"
-  when: succeed_template_names | length > 0
-
-- name: Print info about Templates which failed to be registered
-  debug:
-    msg: "The following Templates failed to be registered: {{ failed_template_names | unique  }}"
-  when: failed_template_names | length > 0
-
-- name: Print info about VMs which failed to run
-  fail:
-    msg: "The following VMs failed to run: {{ failed_to_run_vms | unique  }}"
-  when: failed_to_run_vms | length > 0
-
-- name: Print info about VMs which started successfully
-  debug:
-    msg: "The following VMs started successfully: {{ succeed_to_run_vms | unique  }}"
-  when: succeed_to_run_vms | length > 0
-
-- name: Print info about storage domains that failed to attach
-  debug:
-    msg: "The following storage domains were not added: {{ failed_storage_domains | unique }}"
-  when: failed_storage_domains | length > 0
-
-- name: Print info about storage domains that registered successfully
-  debug:
-    msg: "The following storage domains were successfully added: {{ succeed_storage_domains | unique }}"
-  when: succeed_storage_domains | length > 0
+- name: Print report
+  shell: cat files/{{ dr_report_file }}

@@ -7,6 +7,18 @@
           ca_file: "{{ vars['dr_sites_' + dr_target_host + '_ca_file'] }}"
       ignore_errors: False
 
+    - name: Delete previous report log
+      shell: rm logs/{{ dr_report_file }}
+      ignore_errors: True
+
+    - file:
+        path: logs/
+        state: directory
+
+    - file:
+        path: logs/{{ dr_report_file }}
+        state: touch
+
     - name: Init entity status list
       set_fact:
         failed_vm_names: []

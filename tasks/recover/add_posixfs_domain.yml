@@ -9,6 +9,7 @@
       data_center: "{{ posix_storage['dr_' + dr_target_host + '_dc_name'] }}"
       auth: "{{ ovirt_auth }}"
       posixfs:
+          vfs_type: "{{ posix_storage['dr_' + dr_target_host + '_vfs_type'] }}"
           path: "{{ posix_storage['dr_' + dr_target_host + '_path'] }}"
           address: "{{ posix_storage['dr_' + dr_target_host + '_address'] }}"
 

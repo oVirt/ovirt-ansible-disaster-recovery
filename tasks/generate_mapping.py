@@ -214,8 +214,6 @@ def _write_attached_storage_domains(f, dc_service, dc):
         f.write("- dr_domain_type: %s\n" % attached_sd.storage.type)
         f.write("  dr_primary_name: %s\n" % attached_sd.name)
         f.write("  dr_primary_master_domain: %s\n" % attached_sd.master)
-        f.write("  dr_discard_after_delete: %s\n"
-                % attached_sd.discard_after_delete)
         f.write("  dr_wipe_after_delete: %s\n"
                 % attached_sd.wipe_after_delete)
         f.write("  dr_backup: %s\n" % attached_sd.backup)
@@ -226,12 +224,12 @@ def _write_attached_storage_domains(f, dc_service, dc):
         f.write("  dr_primary_dc_name: %s\n" % dc.name)
         if (not attached_sd._storage.type == types.StorageType.FCP and
                 not attached_sd.storage.type == types.StorageType.ISCSI):
-            f.write("  dr_discard_after_delete: %s\n"
-                    % attached_sd.discard_after_delete)
             f.write("  dr_primary_path: %s\n" % attached_sd.storage.path)
             f.write("  dr_primary_address: %s\n" % attached_sd.storage.address)
             _add_secondary_mount(f)
         else:
+            f.write("  dr_discard_after_delete: %s\n"
+                    % attached_sd.discard_after_delete)
             f.write("  dr_domain_id: %s\n" % attached_sd.id)
             if attached_sd._storage._type == types.StorageType.ISCSI:
                 f.write("  dr_primary_address: %s\n" %

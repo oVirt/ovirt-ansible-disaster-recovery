@@ -179,8 +179,12 @@ def _get_vnic_profile_mapping(connection):
         for network_item in networks_list:
             if network_item.id == vnic_profile_item.network.id:
                 network_name = network_item.name
+                dc_name = connection.system_service().data_centers_service(). \
+                    data_center_service(network_item.data_center.id). \
+                    get()._name
                 break
         mapped_network['network_name'] = network_name
+        mapped_network['network_dc'] = dc_name
         mapped_network['profile_name'] = vnic_profile_item.name
         mapped_network['profile_id'] = vnic_profile_item.id
         networks.append(mapped_network)
@@ -349,11 +353,19 @@ def _write_vnic_profiles(f, networks):
     f.write("dr_network_mappings:\n")
     for network in networks:
         f.write("- primary_network_name: %s\n" % network['network_name'])
+        f.write("# Data Center name is relevant when multiple vnic profiles"
+                " are maintained.\n")
+        f.write("# please uncomment it in case you have more than one DC.\n")
+        f.write("# primary_network_dc: %s\n" % network['network_dc'])
         f.write("  primary_profile_name: %s\n" % network['profile_name'])
         f.write("  primary_profile_id: %s\n" % network['profile_id'])
         f.write("  # Fill in the correlated vnic profile properties in the "
                 "secondary site for profile '%s'\n" % network['profile_name'])
         f.write("  secondary_network_name: # %s\n" % network['network_name'])
+        f.write("# Data Center name is relevant when multiple vnic profiles"
+                " are maintained.\n")
+        f.write("# please uncomment it in case you have more than one DC.\n")
+        f.write("# secondary_network_dc: %s\n" % network['network_dc'])
         f.write("  secondary_profile_name: # %s\n" % network['profile_name'])
         f.write("  secondary_profile_id: # %s\n\n" % network['profile_id'])
 

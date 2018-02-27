@@ -226,7 +226,12 @@ def _write_attached_storage_domains(f, dc_service, dc):
                 not attached_sd.storage.type == types.StorageType.ISCSI):
             f.write("  dr_primary_path: %s\n" % attached_sd.storage.path)
             f.write("  dr_primary_address: %s\n" % attached_sd.storage.address)
+            if (attached_sd._storage.type == types.StorageType.POSIXFS):
+                f.write("  dr_primary_vfs_type: %s\n"
+                        % attached_sd.storage.vfs_type)
             _add_secondary_mount(f)
+            if (attached_sd._storage.type == types.StorageType.POSIXFS):
+                f.write("  dr_secondary_vfs_type: \n")
         else:
             f.write("  dr_discard_after_delete: %s\n"
                     % attached_sd.discard_after_delete)

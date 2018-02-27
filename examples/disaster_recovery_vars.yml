@@ -9,43 +9,56 @@ dr_sites_secondary_ca_file: "/etc/pki/ovirt-engine/ca.pem"
 
 dr_import_storages:
     - dr_domain_type: "nfs"
-      dr_master_domain: "True"
+      dr_primary_master_domain: "True"
       dr_primary_address: "xx.xx.xx.xx"
       dr_primary_path: "/export/path1"
       dr_primary_dc_name: "Prod"
       dr_primary_name: "primary_master_storage"
+      dr_secondary_master_domain: "True"
       dr_secondary_address: "yy.yy.yy.yy"
       dr_secondary_path: "/export/path1"
       dr_secondary_dc_name: "Recovery"
       dr_secondary_name: "secondary_master_storage"
 
     - dr_domain_type: "nfs"
-      dr_master_domain: "False"
+      dr_wipe_after_delete: False
+      dr_backup: False
+      dr_critical_space_action_blocker: 5
+      dr_warning_low_space: 5
+      dr_primary_master_domain: "False"
       dr_primary_name: "path2"
       dr_primary_address: "xx.xx.xx.xx"
       dr_primary_path: "/export/path2"
       dr_primary_dc_name: "Prod"
       dr_secondary_name: "path2"
+      dr_secondary_master_domain: False
       dr_secondary_address: "yy.yy.yy.yy"
       dr_secondary_path: "/export/path2"
       dr_secondary_dc_name: "Recovery"
 
     - dr_domain_type: "iscsi"
-      dr_master_domain: "False"
+      dr_wipe_after_delete: False
+      dr_backup: False
+      dr_critical_space_action_blocker: 1
+      dr_warning_low_space: 5
+      dr_primary_master_domain: "False"
       dr_domain_id: "aa92cc71-1b88-4998-a755-970ef8a638ea"
       dr_primary_address: "yy.yy.yy.yy"
+      dr_primary_port: 3260
       dr_primary_target: ["iqn.2017-10.com.primary.redhat:444"]
       dr_primary_dc_name: "Prod"
       dr_primary_name: "scsi_domain"
-      dr_secondary_address: "zz.zz.zz.zz"
-      dr_secondary_target: ["iqn.2017-07.com.recovery.redhat:444"]
-      dr_secondary_dc_name: "Recovery"
       dr_secondary_name: "scsi_domain"
+      dr_secondary_dc_name: "Recovery"
+      dr_secondary_master_domain: "False"
+      dr_secondary_address: "zz.zz.zz.zz"
+      dr_secondary_port: 3260
+      dr_secondary_target: ["iqn.2017-07.com.recovery.redhat:444"]
 
 # Mapping for cluster
 dr_cluster_mappings:
-    - primary_name: cluster_prod
-      secondary_name: cluster_recovery
+    - primary_name: "cluster_prod"
+      secondary_name: "cluster_recovery"
 
 # Mapping for affinity group
 dr_affinity_group_mappings:

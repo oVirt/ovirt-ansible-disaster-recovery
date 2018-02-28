@@ -44,10 +44,10 @@
        - "{{ iscsi_storage['dr_' + dr_target_host + '_target'] }}"
     loop_control:
        loop_var: dr_target
-  - name: Append to succeed_storage_domains
+  - name: Log append to succeed_storage_domains
     set_fact:
       succeed_storage_domains: "{{ succeed_storage_domains }} + [ \"{{ iscsi_storage['dr_' + dr_target_host + '_name']|default('') }}\" ]"
   rescue:
-    - name: Append to failed_storage_domains
+    - name: Log append to failed_storage_domains
       set_fact:
         failed_storage_domains: "{{ failed_storage_domains }} + [ \"{{ iscsi_storage['dr_' + dr_target_host + '_name']|default('') }}\" ]"

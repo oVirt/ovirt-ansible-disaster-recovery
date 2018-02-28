@@ -11,12 +11,12 @@
       role_mappings: "{{ dr_role_map }}"
   register: template_register_result
 
-- name: Append failed Template to issues failed_template_names
+- name: Log append failed Template to issues failed_template_names
   set_fact:
     failed_template_names: "{{ failed_template_names }} + [ '{{ unreg_template.name }}' ]"
   when: template_register_result | failed
 
-- name: append succeed_template_names
+- name: Log append succeed_template_names
   set_fact:
     succeed_template_names: "{{ succeed_template_names }} + [ '{{ unreg_template.name }}' ]"
   when: template_register_result | succeeded

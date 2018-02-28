@@ -15,12 +15,12 @@
         lun_mappings: "{{ dr_lun_map }}"
         reassign_bad_macs: "{{ dr_reset_mac_pool }}"
     register: vm_register_result
-  - name: Append failed VM to failed_vm_names
+  - name: Log append failed VM to failed_vm_names
     set_fact:
       failed_vm_names: "{{ failed_vm_names }} + [ '{{ unreg_vm.name }}' ]"
     when: vm_register_result | failed
 
-  - name: append succeed_vm_names
+  - name: Log append succeed_vm_names
     set_fact:
       succeed_vm_names: "{{ succeed_vm_names }} + [ '{{ unreg_vm.name }}' ]"
     when: vm_register_result | succeeded

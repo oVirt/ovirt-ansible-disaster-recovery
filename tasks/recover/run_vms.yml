@@ -5,12 +5,12 @@
       wait: False
       auth: "{{ ovirt_auth }}"
   register: result
-- name: Append succeed_to_run_vms
+- name: Log append succeed_to_run_vms
   set_fact:
     succeed_to_run_vms: "{{ succeed_to_run_vms }} + [ '{{ vms.name }}' ]"
   when: result | succeeded
 
-- name: Append failed_to_run_vms
+- name: Log append failed_to_run_vms
   set_fact:
     failed_to_run_vms: "{{ failed_to_run_vms }} + [ '{{ vms.name }}' ]"
   when: result | failed

@@ -1,0 +1,7 @@
+- name:
+  template:
+    src: report_log_template.j2
+    dest: files/{{ dr_report_file }}
+
+- name: Print report
+  shell: cat files/{{ dr_report_file }}

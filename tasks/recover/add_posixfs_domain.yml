@@ -12,4 +12,14 @@
           vfs_type: "{{ posix_storage['dr_' + dr_target_host + '_vfs_type'] }}"
           path: "{{ posix_storage['dr_' + dr_target_host + '_path'] }}"
           address: "{{ posix_storage['dr_' + dr_target_host + '_address'] }}"
+  register: result
 
+- name: Log append to succeed_storage_domains
+  set_fact:
+    succeed_storage_domains: "{{ succeed_storage_domains }} + [ \"{{ posix_storage['dr_' + dr_target_host + '_name'] }}\" ]"
+  when: result is succeeded
+
+- name: Log append to failed_storage_domains
+  set_fact:
+    failed_storage_domains: "{{ failed_storage_domains }} + [ \"{{ posix_storage['dr_' + dr_target_host + '_name'] }}\" ]"
+  when: result is failed

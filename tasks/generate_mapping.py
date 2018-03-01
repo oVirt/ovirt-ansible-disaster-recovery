@@ -103,9 +103,9 @@ def _write_file_header(f, url, username, ca):
 
     f.write("# Please fill in the following properties "
             "for the secondary site: \n")
-    f.write("dr_sites_secondary_url: \n")
-    f.write("dr_sites_secondary_username: \n")
-    f.write("dr_sites_secondary_ca_file: \n\n")
+    f.write("dr_sites_secondary_url: # %s\n" % url)
+    f.write("dr_sites_secondary_username: # %s\n" % username)
+    f.write("dr_sites_secondary_ca_file: # %s\n\n" % ca)
 
 
 def _handle_dc_properties(f, connection):
@@ -179,8 +179,12 @@ def _get_vnic_profile_mapping(connection):
         for network_item in networks_list:
             if network_item.id == vnic_profile_item.network.id:
                 network_name = network_item.name
+                dc_name = connection.system_service().data_centers_service(). \
+                    data_center_service(network_item.data_center.id). \
+                    get()._name
                 break
         mapped_network['network_name'] = network_name
+        mapped_network['network_dc'] = dc_name
         mapped_network['profile_name'] = vnic_profile_item.name
         mapped_network['profile_id'] = vnic_profile_item.id
         networks.append(mapped_network)
@@ -211,9 +215,15 @@ def _write_attached_storage_domains(f, dc_service, dc):
     attached_sds_service = dc_service.storage_domains_service()
     attached_sds_list = attached_sds_service.list()
     for attached_sd in attached_sds_list:
+        if (attached_sd.name == 'hosted_storage'):
+            f.write("# Hosted storage should not be part of the "
+                    "recovery process! Comment it out.\n")
+            f.write("#- dr_domain_type: %s\n" % attached_sd.storage.type)
+            f.write("#  dr_primary_name: %s\n" % attached_sd.name)
+            f.write("#  dr_primary_dc_name: %s\n\n" % dc.name)
+            continue
+
         f.write("- dr_domain_type: %s\n" % attached_sd.storage.type)
-        f.write("  dr_primary_name: %s\n" % attached_sd.name)
-        f.write("  dr_primary_master_domain: %s\n" % attached_sd.master)
         f.write("  dr_wipe_after_delete: %s\n"
                 % attached_sd.wipe_after_delete)
         f.write("  dr_backup: %s\n" % attached_sd.backup)
@@ -221,12 +231,17 @@ def _write_attached_storage_domains(f, dc_service, dc):
                 % attached_sd.critical_space_action_blocker)
         f.write("  dr_warning_low_space: %s\n"
                 % attached_sd.warning_low_space_indicator)
+        f.write("  dr_primary_name: %s\n" % attached_sd.name)
+        f.write("  dr_primary_master_domain: %s\n" % attached_sd.master)
         f.write("  dr_primary_dc_name: %s\n" % dc.name)
         if (not attached_sd._storage.type == types.StorageType.FCP and
                 not attached_sd.storage.type == types.StorageType.ISCSI):
             f.write("  dr_primary_path: %s\n" % attached_sd.storage.path)
             f.write("  dr_primary_address: %s\n" % attached_sd.storage.address)
-            _add_secondary_mount(f)
+            if (attached_sd._storage.type == types.StorageType.POSIXFS):
+                f.write("  dr_primary_vfs_type: %s\n"
+                        % attached_sd.storage.vfs_type)
+            _add_secondary_mount(f, dc.name, attached_sd)
         else:
             f.write("  dr_discard_after_delete: %s\n"
                     % attached_sd.discard_after_delete)
@@ -243,40 +258,47 @@ def _write_attached_storage_domains(f, dc_service, dc):
                 f.write("  dr_primary_target: [%s]\n" %
                         ','.join(['"' + target + '"' for
                                   target in targets]))
-                _add_secondary_scsi(f)
+                _add_secondary_scsi(f, dc.name, attached_sd, targets)
             else:
-                _add_secondary_fcp(f)
+                _add_secondary_fcp(f, dc.name, attached_sd)
         f.write("\n")
 
 
-def _add_secondary_mount(f):
+def _add_secondary_mount(f, dc_name, attached):
     f.write("  # Fill in the empty properties "
             "related to the secondary site\n")
-    f.write("  dr_secondary_dc_name: \n")
-    f.write("  dr_secondary_path: \n")
-    f.write("  dr_secondary_address: \n")
-    f.write("  dr_secondary_name: \n")
-    f.write("  dr_secondary_master_domain: \n")
+    f.write("  dr_secondary_name: # %s\n" % attached.name)
+    f.write("  dr_secondary_master_domain: # %s\n" % attached.master)
+    f.write("  dr_secondary_dc_name: # %s\n" % dc_name)
+    f.write("  dr_secondary_path: # %s\n" % attached.storage.path)
+    f.write("  dr_secondary_address: # %s\n" % attached.storage.address)
+    if (attached._storage.type == types.StorageType.POSIXFS):
+        f.write("  dr_secondary_vfs_type: # %s\n"
+                % attached.storage.vfs_type)
 
 
-def _add_secondary_scsi(f):
+def _add_secondary_scsi(f, dc_name, attached, targets):
     f.write("  # Fill in the empty properties "
             "related to the secondary site\n")
-    f.write("  dr_secondary_dc_name: \n")
-    f.write("  dr_secondary_name: \n")
-    f.write("  dr_secondary_address: \n")
-    f.write("  dr_secondary_port: \n")
+    f.write("  dr_secondary_name: # %s\n" % attached.name)
+    f.write("  dr_secondary_master_domain: # %s\n" % attached.master)
+    f.write("  dr_secondary_dc_name: # %s\n" % dc_name)
+    f.write("  dr_secondary_address: # %s\n" % attached.storage.volume_group
+            .logical_units[0].address)
+    f.write("  dr_secondary_port: # %s\n" % attached.storage.volume_group
+            .logical_units[0].port)
     f.write("  # target example: [\"target1\",\"target2\",\"target3\"]\n")
-    f.write("  dr_secondary_target: \n")
-    f.write("  dr_secondary_master_domain: \n")
+    f.write("  dr_secondary_target: # [%s]\n" %
+            ','.join(['"' + target + '"' for
+                      target in targets]))
 
 
-def _add_secondary_fcp(f):
+def _add_secondary_fcp(f, dc_name, attached):
     f.write("  # Fill in the empty properties "
             "related to the secondary site\n")
-    f.write("  dr_secondary_dc_name: \n")
-    f.write("  dr_secondary_name: \n")
-    f.write("  dr_secondary_master_domain: \n")
+    f.write("  dr_secondary_name: # %s\n" % attached.name)
+    f.write("  dr_secondary_master_domain: # %s\n" % attached.master)
+    f.write("  dr_secondary_dc_name: # %s\n" % dc_name)
 
 
 def _write_clusters(f, clusters):
@@ -286,7 +308,7 @@ def _write_clusters(f, clusters):
         f.write("- primary_name: %s\n" % cluster_name)
         f.write("  # Fill the correlated cluster name in the "
                 "secondary site for cluster '%s'\n" % cluster_name)
-        f.write("  secondary_name: \n\n")
+        f.write("  secondary_name: # %s\n\n" % cluster_name)
 
 
 def _write_affinity_groups(f, affinity_groups):
@@ -296,7 +318,7 @@ def _write_affinity_groups(f, affinity_groups):
         f.write("- primary_name: %s\n" % affinity_group)
         f.write("  # Fill the correlated affinity group name in the "
                 "secondary site for affinity '%s'\n" % affinity_group)
-        f.write("  secondary_name: \n\n")
+        f.write("  secondary_name: # %s\n\n" % affinity_group)
 
 
 def _write_affinity_labels(f, affinity_labels):
@@ -306,7 +328,7 @@ def _write_affinity_labels(f, affinity_labels):
         f.write("- primary_name: %s\n" % affinity_label)
         f.write("  # Fill the correlated affinity label name in the "
                 "secondary site for affinity label '%s'\n" % affinity_label)
-        f.write("  secondary_name: \n\n")
+        f.write("  secondary_name: # %s\n\n" % affinity_label)
 
 
 def _write_aaa_domains(f, domains):
@@ -316,7 +338,7 @@ def _write_aaa_domains(f, domains):
         f.write("- primary_name: %s\n" % domain)
         f.write("  # Fill in the correlated domain in the "
                 "secondary site for domain '%s'\n" % domain)
-        f.write("  secondary_name: \n\n")
+        f.write("  secondary_name: # %s\n\n" % domain)
 
 
 def _write_roles(f):
@@ -331,13 +353,21 @@ def _write_vnic_profiles(f, networks):
     f.write("dr_network_mappings:\n")
     for network in networks:
         f.write("- primary_network_name: %s\n" % network['network_name'])
+        f.write("# Data Center name is relevant when multiple vnic profiles"
+                " are maintained.\n")
+        f.write("# please uncomment it in case you have more than one DC.\n")
+        f.write("# primary_network_dc: %s\n" % network['network_dc'])
         f.write("  primary_profile_name: %s\n" % network['profile_name'])
         f.write("  primary_profile_id: %s\n" % network['profile_id'])
         f.write("  # Fill in the correlated vnic profile properties in the "
                 "secondary site for profile '%s'\n" % network['profile_name'])
-        f.write("  secondary_network_name: \n")
-        f.write("  secondary_profile_name: \n")
-        f.write("  secondary_profile_id: \n\n")
+        f.write("  secondary_network_name: # %s\n" % network['network_name'])
+        f.write("# Data Center name is relevant when multiple vnic profiles"
+                " are maintained.\n")
+        f.write("# please uncomment it in case you have more than one DC.\n")
+        f.write("# secondary_network_dc: %s\n" % network['network_dc'])
+        f.write("  secondary_profile_name: # %s\n" % network['profile_name'])
+        f.write("  secondary_profile_id: # %s\n\n" % network['profile_id'])
 
 
 def _write_external_lun_disks(f, external_disks, host_storages):
@@ -373,8 +403,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
                     f.write("  primary_logical_unit_username: %s\n"
                             "  primary_logical_unit_password: "
                             "PLEASE_SET_PASSWORD_HERE\n"
-                            % (disk_storage.username,
-                               disk_storage.password))
+                            % disk_storage.username)
 
         f.write("  # Fill in the following properties of the external LUN "
                 "disk in the secondary site\n")
@@ -385,16 +414,21 @@ def _write_external_lun_disks(f, external_disks, host_storages):
                 else "STORAGE TYPE COULD NOT BE FETCHED!"
             )
         )
-        f.write("  secondary_logical_unit_id: \n")
+        f.write("  secondary_logical_unit_id: # %s\n" % disk_id)
         if disk_storage_type == types.StorageType.ISCSI:
-            f.write("  secondary_logical_unit_address: \n"
-                    "  secondary_logical_unit_port: \n"
-                    "  secondary_logical_unit_portal: \n"
-                    "  secondary_logical_unit_target: \n")
+            f.write("  secondary_logical_unit_address: # %s\n"
+                    "  secondary_logical_unit_port: # %s\n"
+                    "  secondary_logical_unit_portal: # \"%s\"\n"
+                    "  secondary_logical_unit_target: # %s\n"
+                    % (disk_storage.address,
+                       disk_storage.port,
+                       portal,
+                       disk_storage.target))
             if (disk_storage.username is not None):
-                    f.write("  secondary_logical_unit_username: \n"
+                    f.write("  secondary_logical_unit_username: # %s\n"
                             "  secondary_logical_unit_password:"
-                            "PLEASE_SET_PASSWORD_HERE\n")
+                            "PLEASE_SET_PASSWORD_HERE\n"
+                            % disk_storage.username)
 
 
 if __name__ == "__main__":

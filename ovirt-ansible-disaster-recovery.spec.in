@@ -37,6 +37,9 @@ sh build.sh install
 %license LICENSE
 
 %changelog
+* Thu Mar 1 2018 Ondra Machacek <omachace@redhat.com> - 0.3-1
+- Add reports about the status of a storage domain import.
+
 * Tue Feb 20 2018 Ondra Machacek <omachace@redhat.com> - 0.2-1
 - Add discard after delete to block storage domains when generate mapping.
 - Support cleanup of mapped storage domain.

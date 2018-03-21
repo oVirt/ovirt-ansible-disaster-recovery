@@ -229,6 +229,8 @@ def _write_attached_storage_domains(f, dc_service, dc):
         f.write("  dr_backup: %s\n" % attached_sd.backup)
         f.write("  dr_critical_space_action_blocker: %s\n"
                 % attached_sd.critical_space_action_blocker)
+        f.write("  dr_storage_domain_type: %s\n"
+                % attached_sd.type)
         f.write("  dr_warning_low_space: %s\n"
                 % attached_sd.warning_low_space_indicator)
         f.write("  dr_primary_name: %s\n" % attached_sd.name)

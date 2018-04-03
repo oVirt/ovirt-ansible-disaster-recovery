@@ -5,3 +5,6 @@
 
 - name: Print report
   shell: cat files/{{ dr_report_file }}
+  register: content
+
+- debug: msg="{{ content.stdout_lines | quote }}"

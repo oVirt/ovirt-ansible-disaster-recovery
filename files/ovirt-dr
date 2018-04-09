@@ -1,0 +1,84 @@
+#!/usr/bin/python
+import fail_back
+import fail_over
+import errno
+import os
+import sys
+import generate_vars
+import getopt
+import validator
+
+VALIDATE = 'validate'
+GENERATE = 'generate'
+FAILOVER = 'failover'
+FAILBACK = 'failback'
+# TODO: Use build.sh for those files
+DIR = '/var/log/ovirt-dr'
+LOG_FILE = DIR + '/ovirt-dr.log'
+DEF_CONF_FILE = 'dr.conf'
+
+
+def main(argv):
+    action, conf_file = _init_vars(argv)
+    while not os.path.isfile(conf_file):
+        conf_file = raw_input(
+            "Conf file '" + conf_file + "' does not exist."
+            " Please provide the configuration file location: ")
+    if action == 'validate':
+        validator.ValidateMappingFile().run(conf_file, LOG_FILE)
+    elif action == 'generate':
+        generate_vars.GenerateMappingFile().run(conf_file, LOG_FILE)
+    elif action == 'failover':
+        fail_over.FailOver().run(conf_file, LOG_FILE)
+    elif action == 'failback':
+        fail_back.FailBack().run(conf_file, LOG_FILE)
+    else:
+        print "\tError: action '%s' is not defined" % action
+        help_log()
+
+
+def _init_vars(argv):
+    conf_file = DEF_CONF_FILE
+    if len(argv) == 0:
+        print("ovirt-dr: missing action operand\n"
+              "Try 'ovirt-dr --help' for more information.")
+        sys.exit(2)
+    action = argv[0]
+    try:
+        opts, args = \
+            getopt.getopt(argv, "f:", ["file="])
+    except getopt.GetoptError:
+        help_log()
+        sys.exit(2)
+
+    if not os.path.exists(DIR):
+        print("Create dir file '%s'" % DIR)
+        os.makedirs(DIR)
+
+    for opt, arg in opts:
+        if opt in ("-f", "--filename"):
+            conf_file = arg
+    return (action, conf_file)
+
+
+def help_log():
+    print(
+       '''
+       \tusage: ovirt-dr <%s/%s/%s/%s> [-f <dr.conf>]\n
+       \tHere is a description of the following actions:\n
+       \t\t%s\tGenerate the mapping var file based on primary setup
+       \t\t%s\tValidate the var file mapping
+       \t\t%s\tStart a failover process to the target setup
+       \t\t%s\tStart a failback process to the source setup
+       ''' % (GENERATE,
+              VALIDATE,
+              FAILOVER,
+              FAILBACK,
+              GENERATE,
+              VALIDATE,
+              FAILOVER,
+              FAILBACK))
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

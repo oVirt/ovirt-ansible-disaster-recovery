@@ -6,8 +6,8 @@ The `oVirt.disaster-recovery` role responsible to manage the disaster recovery s
 Requirements
 ------------
 
- * Ansible version 2.4 or higher
- * Python SDK version 4.2.1 or higher
+ * Ansible version 2.5 or higher
+ * Python SDK version 4.2.4 or higher
 
 Role Variables
 --------------

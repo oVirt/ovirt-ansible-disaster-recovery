@@ -179,6 +179,9 @@
 
   # Default value is set in role defaults
   ignore_errors: "{{ dr_ignore_error_recover }}"
+  tags:
+      - fail_over
+      - fail_back
 
 - always:
      - include_tasks: tasks/recover/print_info.yml

@@ -1,5 +1,9 @@
-- name: Remove disk
-  ovirt_disk:
-      state: absent
-      id: "{{ disk.id }}"
-      auth: "{{ ovirt_auth }}"
+- block:
+    - name: Remove disk
+      ovirt_disk:
+          state: absent
+          id: "{{ disk.id }}"
+          auth: "{{ ovirt_auth }}"
+  tags:
+      - fail_back
+      - clean_engine

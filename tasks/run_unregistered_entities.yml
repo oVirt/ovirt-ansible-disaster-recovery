@@ -16,6 +16,8 @@
       when: not item.high_availability.enabled | bool
 
   ignore_errors: "{{ dr_ignore_error_clean }}"
+  tags:
+      - fail_back
 - always:
     - name: Revoke the SSO token
       ovirt_auth:

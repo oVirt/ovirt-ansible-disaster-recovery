@@ -1,5 +1,9 @@
-- name: Remove diskless VMs
-  ovirt_vms:
-      state: absent
-      name: "{{ vm.name }}"
-      auth: "{{ ovirt_auth }}"
+- block:
+    - name: Remove diskless VMs
+      ovirt_vms:
+          state: absent
+          name: "{{ vm.name }}"
+          auth: "{{ ovirt_auth }}"
+  tags:
+      - fail_back
+      - clean_engine

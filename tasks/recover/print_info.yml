@@ -1,10 +1,15 @@
-- name:
-  template:
-    src: report_log_template.j2
-    dest: files/{{ dr_report_file }}
+- block:
+    - name:
+      template:
+        src: report_log_template.j2
+        dest: files/{{ dr_report_file }}
 
-- name: Print report
-  shell: cat files/{{ dr_report_file }}
-  register: content
+    - name: Print report
+      shell: cat files/{{ dr_report_file }}
+      register: content
 
-- debug: msg="{{ content.stdout_lines | quote }}"
+    - debug: msg="{{ content.stdout_lines | quote }}"
+  tags:
+      - fail_over
+      - fail_back
+

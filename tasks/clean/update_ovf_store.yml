@@ -1,13 +1,16 @@
-- name: fetch storage domain only if active
-  ovirt_storage_domains_facts:
-      pattern:  status = active and storage.name={{ storage['dr_' + dr_source_map + '_name'] }}
-      auth: "{{ ovirt_auth }}"
+- block:
+    - name: fetch storage domain only if active
+      ovirt_storage_domains_facts:
+          pattern:  status = active and storage.name={{ storage['dr_' + dr_source_map + '_name'] }}
+          auth: "{{ ovirt_auth }}"
 
-- name: update OVF store for active storage domain
-  ovirt_storage_domains:
-      state: update_ovf_store
-      name: "{{ iscsi_storage['dr_' + dr_source_map + '_name'] }}"
-      auth: "{{ ovirt_auth }}"
-  with_items:
-    - "{{ ovirt_storage_domains }}"
-
+    - name: update OVF store for active storage domain
+      ovirt_storage_domains:
+          state: update_ovf_store
+          name: "{{ iscsi_storage['dr_' + dr_source_map + '_name'] }}"
+          auth: "{{ ovirt_auth }}"
+      with_items:
+        - "{{ ovirt_storage_domains }}"
+  tags:
+      - fail_back
+      - clean_engine

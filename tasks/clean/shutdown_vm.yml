@@ -1,8 +1,12 @@
-- name: Shutdown VMs
-  ovirt_vms:
-      state: stopped
-      name: "{{ vms.name }}"
-      force: True
-      wait: True
-      auth: "{{ ovirt_auth }}"
+- block:
+    - name: Shutdown VMs
+      ovirt_vms:
+          state: stopped
+          name: "{{ vms.name }}"
+          force: True
+          wait: True
+          auth: "{{ ovirt_auth }}"
+  tags:
+          - fail_back
+          - clean_engine
 

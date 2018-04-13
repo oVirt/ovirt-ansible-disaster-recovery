@@ -114,6 +114,10 @@
 
   # Default value is set in role defaults
   ignore_errors: "{{ dr_ignore_error_clean }}"
+  tags:
+      - fail_back
+      - clean_engine
+
 - always:
     - name: Revoke the SSO token
       ovirt_auth:

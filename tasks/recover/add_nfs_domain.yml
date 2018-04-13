@@ -20,3 +20,6 @@
   - name: Log append to failed_storage_domains
     set_fact:
       failed_storage_domains: "{{ failed_storage_domains }} + [ \"{{ nfs_storage['dr_' + dr_target_host + '_name'] }}\" ]"
+  tags:
+      - fail_over
+      - fail_back

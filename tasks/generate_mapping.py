@@ -236,8 +236,9 @@ def _write_attached_storage_domains(f, dc_service, dc):
         f.write("  dr_primary_name: %s\n" % attached_sd.name)
         f.write("  dr_primary_master_domain: %s\n" % attached_sd.master)
         f.write("  dr_primary_dc_name: %s\n" % dc.name)
-        if (not attached_sd._storage.type == types.StorageType.FCP and
-                not attached_sd.storage.type == types.StorageType.ISCSI):
+        is_fcp = attached_sd._storage.type == types.StorageType.FCP
+        is_scsi = attached_sd.storage.type == types.StorageType.ISCSI
+        if (not is_fcp and not is_scsi):
             f.write("  dr_primary_path: %s\n" % attached_sd.storage.path)
             f.write("  dr_primary_address: %s\n" % attached_sd.storage.address)
             if (attached_sd._storage.type == types.StorageType.POSIXFS):
@@ -427,10 +428,10 @@ def _write_external_lun_disks(f, external_disks, host_storages):
                        portal,
                        disk_storage.target))
             if (disk_storage.username is not None):
-                    f.write("  secondary_logical_unit_username: # %s\n"
-                            "  secondary_logical_unit_password:"
-                            "PLEASE_SET_PASSWORD_HERE\n"
-                            % disk_storage.username)
+                f.write("  secondary_logical_unit_username: # %s\n"
+                        "  secondary_logical_unit_password:"
+                        "PLEASE_SET_PASSWORD_HERE\n"
+                        % disk_storage.username)
 
 
 if __name__ == "__main__":

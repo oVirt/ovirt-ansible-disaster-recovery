@@ -24,3 +24,6 @@
     set_fact:
       succeed_vm_names: "{{ succeed_vm_names }} + [ '{{ unreg_vm.name }}' ]"
     when: vm_register_result | succeeded
+  tags:
+      - fail_over
+      - fail_back

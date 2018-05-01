@@ -42,6 +42,7 @@
         loop_control:
             loop_var: fcp_storage
       when: ovirt_hosts.0 is defined
+  ignore_errors: "{{ dr_ignore_error_recover }}"
   tags:
       - fail_over
       - fail_back

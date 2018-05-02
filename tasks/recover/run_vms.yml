@@ -15,6 +15,7 @@
       set_fact:
         failed_to_run_vms: "{{ failed_to_run_vms }} + [ '{{ vms.name }}' ]"
       when: result | failed
+  ignore_errors: "{{ dr_ignore_error_recover }}"
   tags:
       - fail_over
       - fail_back

@@ -24,6 +24,7 @@
       set_fact:
         failed_storage_domains: "{{ failed_storage_domains }} + [ \"{{ gluster_storage['dr_' + dr_target_host + '_name'] }}\" ]"
       when: result is failed
+  ignore_errors: "{{ dr_ignore_error_recover }}"
   tags:
       - fail_over
       - fail_back

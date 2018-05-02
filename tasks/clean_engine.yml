@@ -1,8 +1,4 @@
 - block:
-    - name: test
-      debug:
-              msg: "{{ dr_source_map }}"
-
     - name: Obtain SSO token
       ovirt_auth:
           url: "{{ vars['dr_sites_' + dr_source_map + '_url'] }}"

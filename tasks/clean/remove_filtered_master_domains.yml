@@ -10,6 +10,7 @@
       when: (not only_master and not sd.master) or (only_master and sd.master)
       loop_control:
           loop_var: sd
+  ignore_errors: "{{ dr_ignore_error_clean }}"
   tags:
       - fail_back
       - clean_engine

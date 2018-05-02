@@ -14,6 +14,7 @@
       until: dr_force or result is not failed
       retries: "{{ dr_cleanup_retries_maintenance }}"
       delay: "{{ dr_cleanup_delay_maintenance }}"
+  ignore_errors: "{{ dr_ignore_error_clean }}"
   tags:
       - fail_back
       - clean_engine

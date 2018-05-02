@@ -21,6 +21,7 @@
       set_fact:
         succeed_template_names: "{{ succeed_template_names }} + [ '{{ unreg_template.name }}' ]"
       when: template_register_result | succeeded
+  ignore_errors: "{{ dr_ignore_error_recover }}"
   tags:
       - fail_over
       - fail_back

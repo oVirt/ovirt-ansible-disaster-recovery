@@ -9,7 +9,7 @@
           - clean_engine
 
     - pause:
-          prompt: "Please update once the destination storage domains are ready to be used for recovery"
+          prompt: "[Failback Replication Sync] Please press ENTER once the destination storage domains are ready to be used for the destination setup"
       tags:
           - fail_back
 

@@ -11,6 +11,7 @@
           auth: "{{ ovirt_auth }}"
       with_items:
         - "{{ ovirt_storage_domains }}"
+  ignore_errors: "{{ dr_ignore_error_clean }}"
   tags:
       - fail_back
       - clean_engine

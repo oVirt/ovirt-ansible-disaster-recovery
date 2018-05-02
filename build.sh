@@ -6,12 +6,14 @@ RPM_RELEASE="0.1.$MILESTONE.$(date -u +%Y%m%d%H%M%S)"
 
 ROLE_NAME="oVirt.disaster-recovery"
 PACKAGE_NAME="ovirt-ansible-disaster-recovery"
+LOG_NAME="ovirt-dr"
 PREFIX=/usr/local
 DATAROOT_DIR=$PREFIX/share
 ROLES_DATAROOT_DIR=$DATAROOT_DIR/ansible/roles
 DOC_DIR=$DATAROOT_DIR/doc
 PKG_DATA_DIR=${PKG_DATA_DIR:-$ROLES_DATAROOT_DIR/$PACKAGE_NAME}
 PKG_DATA_DIR_ORIG=${PKG_DATA_DIR_ORIG:-$PKG_DATA_DIR}
+PKG_LOG_DIR=/var/log
 PKG_DOC_DIR=${PKG_DOC_DIR:-$DOC_DIR/$PACKAGE_NAME}
 
 RPM_VERSION=$VERSION
@@ -43,6 +45,8 @@ install() {
   cp -pR library/ $PKG_DATA_DIR
   cp -pR meta/ $PKG_DATA_DIR
   cp -pR tasks/ $PKG_DATA_DIR
+  cp -pR files/ $PKG_DATA_DIR
+  cp examples/dr_play.yml $PKG_DATA_DIR
 
   echo "Installation done."
 }

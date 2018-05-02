@@ -13,6 +13,7 @@ BuildArch:      noarch
 Url:            http://www.ovirt.org
 
 Requires: ansible >= 2.5
+Requires: logrotate
 
 %description
 This Ansible role provide funtionality to perform disaster recovery for oVirt engine.
@@ -26,10 +27,12 @@ This Ansible role provide funtionality to perform disaster recovery for oVirt en
 export PKG_DATA_DIR_ORIG=%{_datadir}/%{ansible_roles_dir}/%{roleprefix}%{rolename}
 export PKG_DATA_DIR=%{buildroot}$PKG_DATA_DIR_ORIG
 export PKG_DOC_DIR=%{buildroot}%{_pkgdocdir}
+install -dm 755 "$PKG_LOG_DIR/$LOG_NAME/$LOG_NAME.log"
 sh build.sh install
 
 %files
 %{_datadir}/%{ansible_roles_dir}/%{roleprefix}%{rolename}
+%config %{_sysconfdir}/logrotate.d/ovirt-dr
 
 %doc README.md
 %doc examples/

@@ -1,0 +1,8 @@
+"/var/log/ovirt-dr"/*.log {
+	daily
+	minsize 10M
+	missingok
+	copytruncate
+	rotate 20
+	compress
+}

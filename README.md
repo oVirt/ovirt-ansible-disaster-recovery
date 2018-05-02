@@ -49,6 +49,29 @@ Example Playbook
 Generate var file mapping [demo](https://youtu.be/s1-Hq_Mk1w8)<br/>
 Fail over scenario [demo](https://youtu.be/mEOgH-Tk09c)
 
+Scripts
+-------
+The ovirt-dr script should provide the user a more convinient way to run
+disaster recovery actions as a way to avoid using ansible playbooks directly.
+There are four actions which the user can execute:
+  validate	validate the var file mapping which is used for failover and failback
+  generate	Generate the mapping var file based on the primary and secondary setup, to be used for failover and failback
+  failover	Start a failover process to the target setup
+  failback	Start a failback process from the target setup to the source setup
+
+Each of those actions is using a configuration file which its default location is oVirt.disaster-recovery/files/dr.conf
+
+Example Script
+--------------
+For mapping file generation:
+  ./ovirt-dr generate
+For mapping file validation:
+  ./ovirt-dr validate
+For fail-over operation:
+  ./ovirt-dr failover
+For fail-back operation:
+  ./ovirt-dr failback
+
 License
 -------
 

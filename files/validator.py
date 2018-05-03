@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from ansible_vault import Vault
+from ansible.parsing.vault import VaultLib
 from bcolors import bcolors
 import collections
 try:
@@ -611,9 +611,9 @@ class ConnectSDK:
         self.second_ca = var_file.get('dr_sites_secondary_ca_file')
 
         if (vault_password != ''):
-            vault = Vault(vault_password)
+            vault = VaultLib(vault_password)
             try:
-                passwords = vault.load(open(pass_file).read())
+                passwords = vault.decrypt(open(pass_file).read())
                 self.primary_password = passwords['dr_sites_primary_password']
                 self.second_password = passwords['dr_sites_secondary_password']
             except BaseException:

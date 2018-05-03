@@ -37,6 +37,13 @@ sh build.sh install
 %license LICENSE
 
 %changelog
+* Thu May 3 2018 Ondra Machacek <omachace@redhat.com> - 0.4-1
+- Add ignore errors to all included tasks.
+- Require Ansible 2.5.
+- Add python scripts for generate_mapping.
+- Add python validator script for mapping file
+- Support include_tasks in ovirt-disaste-recovery.
+
 * Thu Mar 1 2018 Ondra Machacek <omachace@redhat.com> - 0.3-1
 - Add reports about the status of a storage domain import.
 

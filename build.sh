@@ -1,8 +1,8 @@
 #!/bin/bash
 
 VERSION="0.4"
-MILESTONE=master
-RPM_RELEASE="0.1.$MILESTONE.$(date -u +%Y%m%d%H%M%S)"
+MILESTONE=
+RPM_RELEASE="1"
 
 ROLE_NAME="oVirt.disaster-recovery"
 PACKAGE_NAME="ovirt-ansible-disaster-recovery"
@@ -40,6 +40,7 @@ install() {
   mkdir -p $PKG_DOC_DIR
 
   cp -pR defaults/ $PKG_DATA_DIR
+  cp -pR files/ $PKG_DATA_DIR
   cp -pR library/ $PKG_DATA_DIR
   cp -pR meta/ $PKG_DATA_DIR
   cp -pR tasks/ $PKG_DATA_DIR

@@ -1,9 +1,6 @@
 #!/usr/bin/python
 from bcolors import bcolors
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
+from ConfigParser import SafeConfigParser
 import os.path
 import shlex
 import subprocess
@@ -151,8 +148,7 @@ class FailBack():
         """ Declare varialbles """
         target_host, source_map, vault, var_file, ansible_play = \
             '', '', '', '', ''
-        settings = configparser.ConfigParser()
-        settings._interpolation = configparser.ExtendedInterpolation()
+        settings = SafeConfigParser()
         settings.read(conf_file)
         if _SECTION not in settings.sections():
             settings.add_section(_SECTION)

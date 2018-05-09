@@ -2,6 +2,7 @@
 from bcolors import bcolors
 
 from ConfigParser import SafeConfigParser
+import logging
 import os.path
 import ovirtsdk4 as sdk
 import shlex
@@ -25,36 +26,30 @@ PLAY_DEF = "../examples/dr_play.yml"
 
 class GenerateMappingFile():
 
-    def run(self, conf_file, log_file):
-        print("\n%s%sStart generate variable mapping file "
-              "for oVirt ansible disaster recovery%s"
-              % (INFO,
-                 PREFIX,
-                 END))
+    def run(self, conf_file, log_file, log_level):
+        log = self._set_log(log_file, log_level)
+        log.info("Start generate variable mapping file "
+                 "for oVirt ansible disaster recovery")
         dr_tag = "generate_mapping"
         site, username, password, ca_file, var_file_path, _ansible_play = \
-            self._init_vars(conf_file)
-        print("\n%s%sSite address: %s \n"
-              "%susername: %s \n"
-              "%spassword: *******\n"
-              "%sca file location: %s \n"
-              "%soutput file location: %s \n"
-              "%sansible play location: %s \n%s"
-              % (INFO,
-                 PREFIX,
-                 site,
-                 PREFIX,
-                 username,
-                 PREFIX,
-                 PREFIX,
-                 ca_file,
-                 PREFIX,
-                 var_file_path,
-                 PREFIX,
-                 _ansible_play,
-                 END))
-        if not self._validate_connection(site, username, password, ca_file):
-            self._print_error(log_file)
+            self._init_vars(conf_file, log)
+        log.info("Site address: %s \n"
+                 "username: %s \n"
+                 "password: *******\n"
+                 "ca file location: %s \n"
+                 "output file location: %s \n"
+                 "ansible play location: %s "
+                 % (site,
+                    username,
+                    ca_file,
+                    var_file_path,
+                    _ansible_play))
+        if not self._validate_connection(log,
+                                         site,
+                                         username,
+                                         password,
+                                         ca_file):
+            self._print_error(log)
             exit()
         command = "site=" + site + " username=" + username + " password=" + \
             password + " ca=" + ca_file + " var_file=" + var_file_path
@@ -66,38 +61,65 @@ class GenerateMappingFile():
         cmd.append("-e")
         cmd.append(command)
         cmd.append("-vvvvv")
-        with open(log_file, "w") as f:
-            f.write("Executing command %s" % ' '.join(map(str, cmd)))
-            call(cmd, stdout=f)
+        log.info("Executing command %s" % ' '.join(map(str, cmd)))
+        if log_file is not None and log_file != '':
+            self._log_to_file(log_file, cmd)
+        else:
+            self._log_to_console(cmd, log)
+
         if not os.path.isfile(var_file_path):
-            print("%s%scan not find output file in '%s'.%s"
-              % (FAIL,
-                 PREFIX,
-                 var_file_path,
-                 END))
-            self._print_error(log_file)
+            log.error("Can not find output file in '%s'." % var_file_path)
+            self._print_error(log)
             exit()
-        print("\n%s%sVar file location: '%s'%s"
-              % (INFO,
-                 PREFIX,
-                 var_file_path,
-                 END))
-        self._print_success()
+        log.info("Var file location: '%s'" % var_file_path)
+        self._print_success(log)
 
-    def _print_success(self):
-        print("%s%sFinished generating variable mapping file "
-              "for oVirt ansible disaster recovery%s"
-              % (INFO,
-                 PREFIX,
-                 END))
+    def _log_to_file(self, log_file, cmd):
+        with open(log_file, "a") as f:
+            proc = subprocess.Popen(cmd,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            for line in iter(proc.stdout.readline, ''):
+                f.write(line)
+            for line in iter(proc.stderr.readline, ''):
+                f.write(line)
+                print("%s%s%s" % (FAIL,
+                                  line,
+                                  END))
 
-    def _print_error(self, log_file):
-        print("%s%sFailed to generate var file."
-              " See log file '%s' for further details%s"
-              % (FAIL,
-                 PREFIX,
-                 log_file,
-                 END))
+    def _log_to_console(self, cmd, log):
+        proc = subprocess.Popen(cmd,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        for line in iter(proc.stdout.readline, ''):
+            log.debug(line)
+        for line in iter(proc.stderr.readline, ''):
+            log.error(line)
+
+    def _set_log(self, log_file, log_level):
+        logger = logging.getLogger(PREFIX)
+        formatter = logging.Formatter(
+            '%(asctime)s %(levelname)s %(message)s')
+        if log_file is not None and log_file != '':
+            hdlr = logging.FileHandler(log_file)
+            hdlr.setFormatter(formatter)
+            logger.addHandler(hdlr)
+        else:
+            ch = logging.StreamHandler(sys.stdout)
+            logger.addHandler(ch)
+        logger.setLevel(log_level)
+        return logger
+
+    def _print_success(self, log):
+        msg = "Finished generating variable mapping file " \
+              "for oVirt ansible disaster recovery."
+        log.info(msg)
+        print("%s%s%s%s" % (INFO, PREFIX, msg, END))
+
+    def _print_error(self, log):
+        msg = "Failed to generate var file."
+        log.error(msg)
+        print("%s%s%s%s" % (FAIL, PREFIX, msg, END))
 
     def _connect_sdk(self, url, username, password, ca):
         connection = sdk.Connection(
@@ -109,6 +131,7 @@ class GenerateMappingFile():
         return connection
 
     def _validate_connection(self,
+                             log,
                              url,
                              username,
                              password,
@@ -122,35 +145,24 @@ class GenerateMappingFile():
             dcs_service = conn.system_service().data_centers_service()
             dcs_service.list()
         except Exception as e:
-            print(
-                "%s%sConnection to setup has failed."
-                " Please check your cradentials: "
-                "\n%s URL: %s"
-                "\n%s USER: %s"
-                "\n%s CA file: %s%s" %
-                (FAIL,
-                 PREFIX,
-                 PREFIX,
-                 url,
-                 PREFIX,
-                 username,
-                 PREFIX,
-                 ca,
-                 END))
-            print("Error: %s" % e)
+            msg = "Connection to setup has failed. " \
+                  "Please check your cradentials: " \
+                  "\n URL: " + url \
+                  + "\n USER: " + username \
+                  + "\n CA file: " + ca
+            log.error(msg)
+            print("%s%s%s%s" % (FAIL, PREFIX, msg, END))
+            log.error("Error: %s" % e)
             if conn:
                 conn.close()
             return False
         return True
 
-    def _validate_output_file_exists(self, fname):
+    def _validate_output_file_exists(self, fname, log):
         _dir = os.path.dirname(fname)
         if _dir != '' and not os.path.exists(_dir):
-            print("%s%sPath '%s' does not exists. Create folder%s"
-                  % (WARN,
-                     PREFIX,
-                     _dir,
-                     END))
+            log.warn("Path '%s' does not exists. Create folder '%s'"
+                     % _dir)
             os.makedirs(_dir)
         if os.path.isfile(fname):
             valid = {"yes": True, "y": True, "ye": True,
@@ -166,11 +178,10 @@ class GenerateMappingFile():
                 ans = ans.lower()
                 if ans in valid:
                     if not valid[ans]:
-                        print("%s%sFailed to create output file. "
-                              "File could not be overriden.%s"
-                              % (WARN,
-                                 PREFIX,
-                                 END))
+                        msg = "Failed to create output file. " \
+                              "File could not be overriden."
+                        log.error(msg)
+                        print("%s%s%s%s" % (FAIL, PREFIX, msg, END))
                         sys.exit(0)
                     break
                 else:
@@ -181,14 +192,15 @@ class GenerateMappingFile():
             try:
                 os.remove(fname)
             except OSError:
-                print("\n\n%s%SFile %s could not be replaced.%s"
-                      % (WARN,
+                log.error("File %s could not be replaced." % fname)
+                print("%s%sFile %s could not be replaced.%s"
+                      % (FAIL,
                          PREFIX,
                          fname,
                          END))
                 sys.exit(0)
 
-    def _init_vars(self, conf_file):
+    def _init_vars(self, conf_file, log):
         """ Declare constants """
         _SECTION = "generate_vars"
         _SITE = 'site'
@@ -196,7 +208,8 @@ class GenerateMappingFile():
         _PASSWORD = 'password'
         _CA_FILE = 'ca_file'
         # TODO: Must have full path, should add relative path
-        _OUTPUT_FILE = '/var/lib/ovirt-ansible-disaster-recovery/mapping_vars.yml'
+        _OUTPUT_FILE = "/usr/share/ansible/roles/oVirt.disaster-recovery" \
+                       "/mapping_vars.yml"
         _ANSIBLE_PLAY = 'ansible_play'
 
         """ Declare varialbles """
@@ -283,7 +296,7 @@ class GenerateMappingFile():
                                        PREFIX,
                                        _OUTPUT_FILE,
                                        END)) or _OUTPUT_FILE
-        self._validate_output_file_exists(output_file)
+        self._validate_output_file_exists(output_file, log)
         while (not ansible_play) or (not os.path.isfile(ansible_play)):
             ansible_play = raw_input("%s%sAnsible play '%s' is not "
                                      "initialized. Please provide the ansible "
@@ -316,4 +329,7 @@ class DefaultOption(dict):
 
 
 if __name__ == "__main__":
-    GenerateMappingFile().run('dr.conf', '/var/log/ovirt-dr/ovirt-dr.log')
+    level = logging.getLevelName("DEBUG")
+    conf = 'dr.conf'
+    log = '/tmp/ovirt-dr.log'
+    GenerateMappingFile().run(conf, log, level)

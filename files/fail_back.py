@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from bcolors import bcolors
 from ConfigParser import SafeConfigParser
+import logging
 import os.path
 import shlex
 import subprocess
@@ -19,32 +20,23 @@ PLAY_DEF = "../examples/dr_play.yml"
 
 class FailBack():
 
-    def run(self, conf_file, log_file):
-        print("\n%s%sStart failback operation...%s"
-              % (INFO,
-                 PREFIX,
-                 END))
+    def run(self, conf_file, log_file, log_level):
+        log = self._set_log(log_file, log_level)
+        log.info("Start failback operation...")
         dr_tag = "fail_back"
         dr_clean_tag = "clean_engine"
         target_host, source_map, var_file, vault, ansible_play = \
             self._init_vars(conf_file)
-        print("\n%s%starget_host: %s \n"
-              "%ssource_map: %s \n"
-              "%svar_file: %s \n"
-              "%svault: %s \n"
-              "%sansible_play: %s%s \n"
-              % (INFO,
-                  PREFIX,
-                  target_host,
-                  PREFIX,
-                  source_map,
-                  PREFIX,
-                  var_file,
-                  PREFIX,
-                  vault,
-                  PREFIX,
-                  ansible_play,
-                  END))
+        log.info("\ntarget_host: %s \n"
+                 "source_map: %s \n"
+                 "var_file: %s \n"
+                 "vault: %s \n"
+                 "ansible_play: %s \n"
+                 % (target_host,
+                     source_map,
+                     var_file,
+                     vault,
+                     ansible_play))
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -81,52 +73,44 @@ class FailBack():
         vault_pass = raw_input(
             INPUT + PREFIX + "Please enter the vault password: " + END)
         os.system("export vault_password=\"" + vault_pass + "\"")
+        log.info("Starting cleanup process of setup %s"
+                 " for oVirt ansible disaster recovery" % target_host)
         print("\n%s%sStarting cleanup process of setup '%s'"
               " for oVirt ansible disaster recovery%s"
               % (INFO,
                   PREFIX,
                   target_host,
                   END))
-        with open(log_file, "w") as f:
-            f.write("Executing cleanup command: %s" % ' '.join(map(str, cmd)))
-            proc = subprocess.Popen(cmd,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
-            for line in iter(proc.stdout.readline, ''):
-                # TODO: since we dont want to have log and print the
-                # progress in the stdout, we only filter the task names
-                # We should find a better way to do so.
-                if 'TASK [ovirt-ansible-disaster-recovery : ' in line:
-                    sys.stdout.write("\n" + line + "\n")
-                f.write(line)
+        log.info("Executing cleanup command: %s" % ' '.join(map(str, cmd)))
+        if log_file is not None and log_file != '':
+            self._log_to_file(log_file, cmd)
+        else:
+            self._log_to_console(cmd, log)
 
-            print("\n%s%sFinished cleanup of setup '%s'"
-                  " for oVirt ansible disaster recovery%s"
-                  % (INFO,
-                      PREFIX,
-                      source_map,
-                      END))
+        log.info("Finished cleanup of setup %s"
+                 " for oVirt ansible disaster recovery" % source_map)
+        print("\n%s%sFinished cleanup of setup '%s'"
+              " for oVirt ansible disaster recovery%s"
+              % (INFO,
+                  PREFIX,
+                  source_map,
+                  END))
 
-            print("\n%s%sStarting fail-back process to setup '%s'"
-                  " from setup '%s' for oVirt ansible disaster recovery"
-                  % (INFO,
-                      PREFIX,
-                      target_host,
-                      source_map))
+        log.info("Start failback DR from setup '%s'" % target_host)
+        print("\n%s%sStarting fail-back process to setup '%s'"
+              " from setup '%s' for oVirt ansible disaster recovery%s"
+              % (INFO,
+                  PREFIX,
+                  target_host,
+                  source_map,
+                  END))
 
-            f.write("Executing command %s" % ' '.join(map(str, cmd_fb)))
-            proc_fb = subprocess.Popen(cmd_fb,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-            for line in iter(proc_fb.stdout.readline, ''):
-                # TODO: since we dont want to have log and print the
-                # progress in the stdout, we only filter the task names
-                # We should find a better way to do so.
-                if 'TASK [ovirt-ansible-disaster-recovery :' in line:
-                    sys.stdout.write("\n" + line + "\n")
-                if "[Failback Replication Sync]" in line:
-                    sys.stdout.write("\n" + INPUT + line + END)
-                f.write(line)
+        log.info("Executing failback command: %s"
+                 % ' '.join(map(str, cmd_fb)))
+        if log_file is not None and log_file != '':
+            self._log_to_file(log_file, cmd_fb)
+        else:
+            self._log_to_console(cmd_fb, log)
 
         call(["cat", "/tmp/report.log"])
         print("\n%s%sFinished failback operation"
@@ -134,6 +118,37 @@ class FailBack():
               % (INFO,
                   PREFIX,
                   END))
+
+    def _log_to_file(self, log_file, cmd):
+        with open(log_file, "a") as f:
+            proc = subprocess.Popen(cmd,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            for line in iter(proc.stdout.readline, ''):
+                if 'TASK [' in line:
+                    print("\n%s%s%s\n" % (INFO,
+                                          line,
+                                          END))
+                if "[Failback Replication Sync]" in line:
+                    print("%s%s%s" % (INFO, line, END))
+                f.write(line)
+            for line in iter(proc.stderr.readline, ''):
+                f.write(line)
+                print("%s%s%s" % (WARN,
+                                  line,
+                                  END))
+
+    def _log_to_console(self, cmd, log):
+        proc = subprocess.Popen(cmd,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        for line in iter(proc.stdout.readline, ''):
+            if "[Failback Replication Sync]" in line:
+                print("%s%s%s" % (INFO, line, END))
+            else:
+                log.debug(line)
+        for line in iter(proc.stderr.readline, ''):
+            log.warn(line)
 
     def _init_vars(self, conf_file):
         """ Declare constants """
@@ -205,7 +220,7 @@ class FailBack():
                                     END))
         while not os.path.isfile(vault):
             vault = raw_input("%s%spassword file '%s' does not exist."
-                              "Please provide a valid password file:%s "
+                              " Please provide a valid password file:%s "
                               % (INPUT,
                                  PREFIX,
                                  vault,
@@ -222,6 +237,20 @@ class FailBack():
                                         PLAY_DEF,
                                         END) or PLAY_DEF)
         return (target_host, source_map, var_file, vault, ansible_play)
+
+    def _set_log(self, log_file, log_level):
+        logger = logging.getLogger(PREFIX)
+        formatter = logging.Formatter(
+            '%(asctime)s %(levelname)s %(message)s')
+        if log_file is not None and log_file != '':
+            hdlr = logging.FileHandler(log_file)
+            hdlr.setFormatter(formatter)
+            logger.addHandler(hdlr)
+        else:
+            ch = logging.StreamHandler(sys.stdout)
+            logger.addHandler(ch)
+        logger.setLevel(log_level)
+        return logger
 
 
 class DefaultOption(dict):
@@ -243,4 +272,7 @@ class DefaultOption(dict):
 
 
 if __name__ == "__main__":
-    FailBack().run('dr.conf', '/var/log/ovirt-dr/ovirt-dr.log')
+    level = logging.getLevelName("DEBUG")
+    conf = 'dr.conf'
+    log = '/tmp/ovirt-dr.log'
+    FailBack().run(conf, log, level)

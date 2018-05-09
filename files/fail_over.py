@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from bcolors import bcolors
 from ConfigParser import SafeConfigParser
+import logging
 import os.path
 import shlex
 import subprocess
@@ -19,31 +20,22 @@ PLAY_DEF = "../examples/dr_play.yml"
 
 class FailOver():
 
-    def run(self, conf_file, log_file):
-        print("\n%s%sStart failover operation...%s"
-              % (INFO,
-                 PREFIX,
-                 END))
+    def run(self, conf_file, log_file, log_level):
+        log = self._set_log(log_file, log_level)
+        log.info("Start failover operation...")
         dr_tag = "fail_over"
         target_host, source_map, var_file, vault, ansible_play = \
             self._init_vars(conf_file)
-        print("\n%s%starget_host: %s \n"
-              "%ssource_map: %s \n"
-              "%svar_file: %s \n"
-              "%svault: %s \n"
-              "%sansible_play: %s%s \n"
-              % (INFO,
-                  PREFIX,
-                  target_host,
-                  PREFIX,
-                  source_map,
-                  PREFIX,
-                  var_file,
-                  PREFIX,
-                  vault,
-                  PREFIX,
-                  ansible_play,
-                  END))
+        log.info("target_host: %s \n"
+                 "source_map: %s \n"
+                 "var_file: %s \n"
+                 "vault: %s \n"
+                 "ansible_play: %s "
+                 % (target_host,
+                    source_map,
+                    var_file,
+                    vault,
+                    ansible_play))
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -59,25 +51,44 @@ class FailOver():
             " dr_target_host=" + target_host + " dr_source_map=" + source_map)
         cmd.append("--ask-vault-pass")
         cmd.append("-vvvvv")
-        with open(log_file, "w") as f:
-            f.write("Executing failover command: %s" % ' '.join(map(str, cmd)))
-            proc = subprocess.Popen(cmd,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
-            for line in iter(proc.stdout.readline, ''):
-                # TODO: since we dont want to have log and print the
-                # progress in the stdout, we only filter the task names
-                # We should find a better way to do so.
-                if 'TASK [ovirt-ansible-disaster-recovery : ' in line:
-                    sys.stdout.write("\n" + line + "\n")
-                f.write(line)
-        call(['cat', '/tmp/report.log'])
-
+        log.info("Executing failover command: %s" % ' '.join(map(str, cmd)))
+        if log_file is not None and log_file != '':
+            self._log_to_file(log_file, cmd)
+        else:
+            self._log_to_console(cmd, log)
+        call(['cat', 'report.log'])
         print("\n%s%sFinished failover operation"
               " for oVirt ansible disaster recovery%s"
               % (INFO,
                   PREFIX,
                   END))
+
+    def _log_to_file(self, log_file, cmd):
+        with open(log_file, "a") as f:
+            proc = subprocess.Popen(cmd,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            for line in iter(proc.stdout.readline, ''):
+                if 'TASK [' in line:
+                    print("\n%s%s%s\n" % (INFO,
+                                          line,
+                                          END))
+                f.write(line)
+            for line in iter(proc.stderr.readline, ''):
+                f.write(line)
+                print("%s%s%s" % (WARN,
+                                  line,
+                                  END))
+        call(['cat', '/tmp/report.log'])
+
+    def _log_to_console(self, cmd, log):
+        proc = subprocess.Popen(cmd,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        for line in iter(proc.stdout.readline, ''):
+            log.debug(line)
+        for line in iter(proc.stderr.readline, ''):
+            log.warn(line)
 
     def _init_vars(self, conf_file):
         """ Declare constants """
@@ -144,7 +155,7 @@ class FailOver():
                                     var_file,
                                     END))
         while not os.path.isfile(vault):
-            vault = raw_input("%s%spassword file '%s' does not exist."
+            vault = raw_input("%s%spassword file '%s' does not exist. "
                               "Please provide a valid password file:%s "
                               % (INPUT,
                                  PREFIX,
@@ -162,6 +173,20 @@ class FailOver():
                                         PLAY_DEF,
                                         END) or PLAY_DEF)
         return (target_host, source_map, var_file, vault, ansible_play)
+
+    def _set_log(self, log_file, log_level):
+        logger = logging.getLogger(PREFIX)
+        formatter = logging.Formatter(
+            '%(asctime)s %(levelname)s %(message)s')
+        if log_file is not None and log_file != '':
+            hdlr = logging.FileHandler(log_file)
+            hdlr.setFormatter(formatter)
+            logger.addHandler(hdlr)
+        else:
+            ch = logging.StreamHandler(sys.stdout)
+            logger.addHandler(ch)
+        logger.setLevel(log_level)
+        return logger
 
 
 class DefaultOption(dict):
@@ -183,4 +208,7 @@ class DefaultOption(dict):
 
 
 if __name__ == "__main__":
-    FailOver().run('dr.conf', '/var/log/ovirt-dr/ovirt-dr.log')
+    level = logging.getLevelName("DEBUG")
+    conf = 'dr.conf'
+    log = '/tmp/ovirt-dr.log'
+    FailOver().run(conf, log, level)

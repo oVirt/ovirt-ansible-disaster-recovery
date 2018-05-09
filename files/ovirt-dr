@@ -1,8 +1,5 @@
 #!/usr/bin/python
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
+from ConfigParser import SafeConfigParser
 import fail_back
 import fail_over
 import errno
@@ -101,8 +98,7 @@ def _get_log_conf(conf_file, log_file, log_level):
         conf_file = raw_input(
             "Conf file '" + conf_file + "' does not exist."
             " Please provide the configuration file location: ")
-    settings = configparser.ConfigParser()
-    settings._interpolation = configparser.ExtendedInterpolation()
+    settings = SafeConfigParser()
     settings.read(conf_file)
     if log_section not in settings.sections():
         settings.add_section(log_section)

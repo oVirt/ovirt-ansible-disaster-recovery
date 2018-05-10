@@ -161,7 +161,7 @@ class GenerateMappingFile():
     def _validate_output_file_exists(self, fname, log):
         _dir = os.path.dirname(fname)
         if _dir != '' and not os.path.exists(_dir):
-            log.warn("Path '%s' does not exists. Create folder '%s'"
+            log.warn("Path '%s' does not exists. Create folder"
                      % _dir)
             os.makedirs(_dir)
         if os.path.isfile(fname):
@@ -202,14 +202,13 @@ class GenerateMappingFile():
 
     def _init_vars(self, conf_file, log):
         """ Declare constants """
-        _SECTION = "generate_vars"
+        _SECTION = 'generate_vars'
         _SITE = 'site'
         _USERNAME = 'username'
         _PASSWORD = 'password'
         _CA_FILE = 'ca_file'
         # TODO: Must have full path, should add relative path
-        _OUTPUT_FILE = "/usr/share/ansible/roles/oVirt.disaster-recovery" \
-                       "/mapping_vars.yml"
+        _OUTPUT_FILE = 'output_file'
         _ANSIBLE_PLAY = 'ansible_play'
 
         """ Declare varialbles """

@@ -149,6 +149,20 @@ class FailBack():
                 log.debug(line)
         for line in iter(proc.stderr.readline, ''):
             log.warn(line)
+        self._handle_result(subprocess, cmd)
+
+    def _handle_result(self, subprocess, cmd):
+        try:
+            proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+            # do something with output
+        except subprocess.CalledProcessError, e:
+            print("%sException: %s\n\n"
+                  "failback operation failed, please check log file for "
+                  "further details.%s"
+                  % (FAIL,
+                     e,
+                     END))
+            exit()
 
     def _init_vars(self, conf_file):
         """ Declare constants """

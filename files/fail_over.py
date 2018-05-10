@@ -83,7 +83,20 @@ class FailOver():
                 print("%s%s%s" % (WARN,
                                   line,
                                   END))
+        self._handle_result(subprocess, cmd)
         call(['cat', '/tmp/report.log'])
+
+    def _handle_result(self, subprocess, cmd):
+        try:
+            proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError, e:
+            print("%sException: %s\n\n"
+                  "failover operation failed, please check log file for "
+                  "further details.%s"
+                  % (FAIL,
+                     e,
+                     END))
+            exit()
 
     def _log_to_console(self, cmd, log):
         proc = subprocess.Popen(cmd,

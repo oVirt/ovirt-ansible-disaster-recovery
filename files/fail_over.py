@@ -49,8 +49,12 @@ class FailOver():
         cmd.append("-e")
         cmd.append(
             " dr_target_host=" + target_host + " dr_source_map=" + source_map)
-        cmd.append("--ask-vault-pass")
-        cmd.append("-vvvvv")
+        cmd.append("--vault-password-file")
+        cmd.append("vault_secret.sh")
+        cmd.append("-vvv")
+        vault_pass = raw_input(
+            INPUT + PREFIX + "Please enter the vault password: " + END)
+        os.system("export vault_password=\"" + vault_pass + "\"")
         log.info("Executing failover command: %s" % ' '.join(map(str, cmd)))
         if log_file is not None and log_file != '':
             self._log_to_file(log_file, cmd)

@@ -223,6 +223,16 @@ def _write_attached_storage_domains(f, dc_service, dc):
             f.write("#  dr_primary_dc_name: %s\n\n" % dc.name)
             continue
 
+        if (attached_sd.type == types.StorageDomainType.EXPORT):
+            f.write("# Export storage domain should not be part of the "
+                    "recovery process!\n")
+            f.write("# Please note that a data center with an export "
+                    "storage domain might reflect on the failback process.\n")
+            f.write("#- dr_domain_type: %s\n" % attached_sd.storage.type)
+            f.write("#  dr_primary_name: %s\n" % attached_sd.name)
+            f.write("#  dr_primary_dc_name: %s\n\n" % dc.name)
+            continue
+
         f.write("- dr_domain_type: %s\n" % attached_sd.storage.type)
         f.write("  dr_wipe_after_delete: %s\n"
                 % attached_sd.wipe_after_delete)

@@ -73,6 +73,10 @@ class ValidateMappingFile():
         if (not self._validate_hosted_engine(python_vars)):
             self._print_finish_error()
             exit()
+
+        if (not self._validate_export_domain(python_vars)):
+            self._print_finish_error()
+            exit()
         self._print_finish_success()
 
     def _validate_lists_in_mapping_file(self, mapping_vars):
@@ -402,6 +406,18 @@ class ValidateMappingFile():
             secondary = domain['dr_secondary_name']
             if (primary == hosted or secondary == hosted):
                 print("%s%sHosted storage domains are not supported.%s"
+                      % (FAIL,
+                         PREFIX,
+                         END))
+                return False
+        return True
+
+    def _validate_export_domain(self, var_file):
+        domains = var_file[self.domain_map]
+        for domain in domains:
+            domain_type = domain['dr_storage_domain_type']
+            if domain_type == 'export':
+                print("%s%sExport storage domain is not supported.%s"
                       % (FAIL,
                          PREFIX,
                          END))

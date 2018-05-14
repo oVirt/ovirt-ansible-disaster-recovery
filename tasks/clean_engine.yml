@@ -6,13 +6,15 @@
           password: "{{ vars['dr_sites_' + dr_source_map + '_password'] }}"
           ca_file: "{{ vars['dr_sites_' + dr_source_map + '_ca_file'] }}"
 
-    - include_tasks: tasks/clean/shutdown_vms.yml storage={{ item }}
+    - name: Shutdown running VMs
+      include_tasks: tasks/clean/shutdown_vms.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
           loop_var: storage
 
-    - include_tasks: tasks/clean/update_ovf_store.yml storage={{ item }}
+    - name: Update OVF_STORE disk for storage domains
+      include_tasks: tasks/clean/update_ovf_store.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -28,6 +30,7 @@
     - name: Set master storage domain filter
       set_fact: only_master=False
 
+    - name: Remove non master storage domains with valid statuses
     - include_tasks: tasks/clean/remove_filtered_master_domains.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
@@ -43,6 +46,7 @@
       # TODO: Filter only data and iso types
       set_fact: dr_query_domain_search='type != glance and type != cinder and status != active'
 
+    - name: Remove non master storage domains with invalid statuses using force remove
     - include_tasks: tasks/clean/remove_filtered_master_domains.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
@@ -59,6 +63,7 @@
     - name: Set force remove flag to false for master domain
       set_fact: dr_force=False
 
+    - name: Remove master storage domains with valid statuses
     - include_tasks: tasks/clean/remove_filtered_master_domains.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
@@ -73,6 +78,7 @@
       # TODO: Filter only data and iso types
       set_fact: dr_query_domain_search='type != glance and type != cinder and status != active'
 
+    - name: Remove master storage domains with invalid statuses using force remove
     - include_tasks: tasks/clean/remove_filtered_master_domains.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
@@ -92,7 +98,8 @@
           auth: "{{ ovirt_auth }}"
       when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0
 
-    - include_tasks: tasks/clean/remove_vms.yml vm={{ item }}
+    - name: Remove vms if no storage domains left in setup
+      include_tasks: tasks/clean/remove_vms.yml vm={{ item }}
       with_items: "{{ ovirt_vms }}"
       when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0
 
@@ -103,7 +110,8 @@
           auth: "{{ ovirt_auth }}"
       when: dr_clean_orphaned_disks and ovirt_storage_domains | length == 0
 
-    - include_tasks: tasks/clean/remove_disks.yml disk={{ item }}
+    - name: Remove LUN disks if no storage domains left in setup
+      include_tasks: tasks/clean/remove_disks.yml disk={{ item }}
       with_items: "{{ ovirt_disks }}"
       when: dr_clean_orphaned_disks and ovirt_storage_domains | length == 0
 

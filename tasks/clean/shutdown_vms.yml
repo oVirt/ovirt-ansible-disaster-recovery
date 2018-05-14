@@ -6,7 +6,8 @@
           auth: "{{ ovirt_auth }}"
 
     # TODO: Add a wait until the VM is really down
-    - include_tasks: tasks/clean/shutdown_vm.yml vms={{ item }}
+    - name: Shutdown VMs
+      include_tasks: tasks/clean/shutdown_vm.yml vms={{ item }}
       with_items: "{{ ovirt_vms }}"
   ignore_errors: "{{ dr_ignore_error_clean }}"
   tags:

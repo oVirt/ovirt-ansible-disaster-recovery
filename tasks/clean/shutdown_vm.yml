@@ -1,5 +1,5 @@
 - block:
-    - name: Shutdown VMs
+    - name: Shutdown VM
       ovirt_vms:
           state: stopped
           name: "{{ vms.name }}"

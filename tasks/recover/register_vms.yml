@@ -11,7 +11,8 @@
           unreg_vms: "{{ unreg_vms|default([]) }} + {{ ovirt_storage_vms }}"
 
     # TODO: We should filter out vms which were already exists in the setup (diskless VMs)
-    - include: tasks/recover/register_vm.yml
+    - name: Register VM
+      include: tasks/recover/register_vm.yml
       with_items: "{{ ovirt_storage_vms }}"
       # We use loop_control so storage.name will not be overriden by the nested loop.
       loop_control:

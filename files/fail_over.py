@@ -74,7 +74,7 @@ class FailOver():
                 if 'TASK [ovirt-ansible-disaster-recovery : ' in line:
                     sys.stdout.write("\n" + line + "\n")
                 f.write(line)
-        call(['cat', '../files/report.log'])
+        call(['cat', '/tmp/report.log'])
 
         print("\n%s%sFinished failover operation"
               " for oVirt ansible disaster recovery%s"

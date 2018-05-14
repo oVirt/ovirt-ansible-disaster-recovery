@@ -131,7 +131,7 @@ class FailBack():
                     sys.stdout.write("\n" + INPUT + line + END)
                 f.write(line)
 
-        call(["cat", "report.log"])
+        call(["cat", "/tmp/report.log"])
         print("\n%s%sFinished failback operation"
               " for oVirt ansible disaster recovery%s"
               % (INFO,

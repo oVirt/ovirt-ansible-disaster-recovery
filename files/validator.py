@@ -1,11 +1,8 @@
 #!/usr/bin/python
-from ansible_vault import Vault
+from ansible.parsing.vault import VaultLib
 from bcolors import bcolors
 import collections
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
+from ConfigParser import SafeConfigParser
 import os.path
 import ovirtsdk4 as sdk
 import ovirtsdk4.types as types
@@ -121,8 +118,7 @@ class ValidateMappingFile():
         _VAULT = 'vault'
 
         # Get default location of the yml var file.
-        settings = configparser.ConfigParser()
-        settings._interpolation = configparser.ExtendedInterpolation()
+        settings = SafeConfigParser()
         settings.read(conf_file)
         if _SECTION not in settings.sections():
             settings.add_section(_SECTION)
@@ -611,9 +607,9 @@ class ConnectSDK:
         self.second_ca = var_file.get('dr_sites_secondary_ca_file')
 
         if (vault_password != ''):
-            vault = Vault(vault_password)
+            vault = VaultLib(vault_password)
             try:
-                passwords = vault.load(open(pass_file).read())
+                passwords = vault.decrypt(open(pass_file).read())
                 self.primary_password = passwords['dr_sites_primary_password']
                 self.second_password = passwords['dr_sites_secondary_password']
             except BaseException:

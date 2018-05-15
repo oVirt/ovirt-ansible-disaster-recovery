@@ -6,6 +6,7 @@ import os.path
 import shlex
 import subprocess
 import sys
+import time
 
 from subprocess import call
 
@@ -16,6 +17,7 @@ FAIL = bcolors.FAIL
 END = bcolors.ENDC
 PREFIX = "[Failover] "
 PLAY_DEF = "../examples/dr_play.yml"
+report_name = "report-{}.log"
 
 
 class FailOver():
@@ -26,16 +28,19 @@ class FailOver():
         dr_tag = "fail_over"
         target_host, source_map, var_file, vault, ansible_play = \
             self._init_vars(conf_file)
+        report = report_name.format(int(round(time.time() * 1000)))
         log.info("target_host: %s \n"
                  "source_map: %s \n"
                  "var_file: %s \n"
                  "vault: %s \n"
-                 "ansible_play: %s "
+                 "ansible_play: %s \n"
+                 "report file: /tmp/%s "
                  % (target_host,
                     source_map,
                     var_file,
                     vault,
-                    ansible_play))
+                    ansible_play,
+                    report))
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -48,7 +53,8 @@ class FailOver():
         cmd.append("@" + vault)
         cmd.append("-e")
         cmd.append(
-            " dr_target_host=" + target_host + " dr_source_map=" + source_map)
+            " dr_target_host=" + target_host + " dr_source_map=" + source_map +
+            " dr_report_file=" + report)
         cmd.append("--vault-password-file")
         cmd.append("vault_secret.sh")
         cmd.append("-vvv")
@@ -60,7 +66,7 @@ class FailOver():
             self._log_to_file(log_file, cmd)
         else:
             self._log_to_console(cmd, log)
-        call(['cat', 'report.log'])
+        call(['cat', "/tmp/" + report])
         print("\n%s%sFinished failover operation"
               " for oVirt ansible disaster recovery%s"
               % (INFO,
@@ -83,10 +89,9 @@ class FailOver():
                 print("%s%s%s" % (WARN,
                                   line,
                                   END))
-        self._handle_result(subprocess, cmd)
-        call(['cat', '/tmp/report.log'])
+        self._handle_result(cmd)
 
-    def _handle_result(self, subprocess, cmd):
+    def _handle_result(self, cmd):
         try:
             proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError, e:

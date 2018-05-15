@@ -6,6 +6,7 @@ import os.path
 import shlex
 import subprocess
 import sys
+import time
 
 from subprocess import call
 
@@ -16,6 +17,7 @@ FAIL = bcolors.FAIL
 END = bcolors.ENDC
 PREFIX = "[Failback] "
 PLAY_DEF = "../examples/dr_play.yml"
+report_name = "report-{}.log"
 
 
 class FailBack():
@@ -27,16 +29,19 @@ class FailBack():
         dr_clean_tag = "clean_engine"
         target_host, source_map, var_file, vault, ansible_play = \
             self._init_vars(conf_file)
+        report = report_name.format(int(round(time.time() * 1000)))
         log.info("\ntarget_host: %s \n"
                  "source_map: %s \n"
                  "var_file: %s \n"
                  "vault: %s \n"
                  "ansible_play: %s \n"
+                 "report log: /tmp/%s \n"
                  % (target_host,
                      source_map,
                      var_file,
                      vault,
-                     ansible_play))
+                     ansible_play,
+                     report))
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -64,7 +69,8 @@ class FailBack():
         cmd_fb.append("@" + vault)
         cmd_fb.append("-e")
         cmd_fb.append(" dr_target_host=" + target_host +
-                      " dr_source_map=" + source_map)
+                      " dr_source_map=" + source_map +
+                      " dr_report_file=" + report)
         cmd_fb.append("--vault-password-file")
         cmd_fb.append("vault_secret.sh")
         cmd_fb.append("-vvv")
@@ -112,7 +118,7 @@ class FailBack():
         else:
             self._log_to_console(cmd_fb, log)
 
-        call(["cat", "/tmp/report.log"])
+        call(["cat", "/tmp/" + report])
         print("\n%s%sFinished failback operation"
               " for oVirt ansible disaster recovery%s"
               % (INFO,

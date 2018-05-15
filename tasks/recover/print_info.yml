@@ -1,11 +1,11 @@
 - block:
-    - name:
+    - name: Generate log file through template
       template:
         src: report_log_template.j2
-        dest: files/{{ dr_report_file }}
+        dest: /tmp/{{ dr_report_file }}
 
-    - name: Print report
-      shell: cat files/{{ dr_report_file }}
+    - name: Print report file
+      shell: cat /tmp/{{ dr_report_file }}
       register: content
 
     - debug: msg="{{ content.stdout_lines | quote }}"

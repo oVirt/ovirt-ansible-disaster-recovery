@@ -25,17 +25,12 @@
 
     # Set all the queries suffix to fetch a storage domain in a specific status.
     # Note: Export storage domain is not supported and should not be part of storage mapping
-    - name: Set query suffix for active storage domains
-      set_fact: dr_active_domain_search='status = active and type != cinder'
-
-    - name: Set query suffix for maintenance storage domains
-      set_fact: dr_maintenance_domain_search='status = maintenance and type != cinder'
-
-    - name: Set query suffix for unattached storage domains
-      set_fact: dr_unattached_domain_search='status = unattached and type != cinder and type != glance'
-
-    - name: Set query for remove invalid storage domains
-      set_fact: dr_inactive_domain_search='type != glance and type != cinder and status != active'
+    - name: Setup queries for storage domains
+      set_fact:
+          dr_active_domain_search='status = active and type != cinder'
+          dr_maintenance_domain_search='status = maintenance and type != cinder'
+          dr_unattached_domain_search='status = unattached and type != cinder and type != glance'
+          dr_inactive_domain_search='type != glance and type != cinder and status != active'
 
     - name: Set master storage domain filter
       set_fact: only_master=False

@@ -1,11 +1,11 @@
 - block:
-    - name: Fetch storage domains for detach
+    - name: Fetch invalid storage domain for remove
       ovirt_storage_domains_facts:
-          pattern:  name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_query_domain_search }}
+          pattern:  name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_inactive_domain_search }}
           auth: "{{ ovirt_auth }}"
 
-    - name: Remove storage domain
-      include_tasks: tasks/clean/remove_domain_process.yml sd={{ item }}
+    - name: Remove invalid storage domain
+      include_tasks: tasks/clean/remove_domain_process.yml sd={{ sd }}
       with_items:
           - "{{ ovirt_storage_domains }}"
       when: (not only_master and not sd.master) or (only_master and sd.master)

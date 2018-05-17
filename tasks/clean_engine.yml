@@ -23,39 +23,41 @@
     - name: Set force remove flag to false for non master domains
       set_fact: dr_force=False
 
-    - name: Set query for remove valid non master domains
-      # TODO: Filter only data and iso types
-      set_fact: dr_query_domain_search='status = active and type != cinder or status = maintenance and type != cinder or status = unattached and type != glance and type != cinder'
+    # Set all the queries suffix to fetch a storage domain in a specific status.
+    # Note: Export storage domain is not supported and should not be part of storage mapping
+    - name: Set query suffix for active storage domains
+      set_fact: dr_active_domain_search='status = active and type != cinder'
+
+    - name: Set query suffix for maintenance storage domains
+      set_fact: dr_maintenance_domain_search='status = maintenance and type != cinder'
+
+    - name: Set query suffix for unattached storage domains
+      set_fact: dr_unattached_domain_search='status = unattached and type != cinder and type != glance'
+
+    - name: Set query for remove invalid storage domains
+      set_fact: dr_inactive_domain_search='type != glance and type != cinder and status != active'
 
     - name: Set master storage domain filter
       set_fact: only_master=False
 
     - name: Remove non master storage domains with valid statuses
-    - include_tasks: tasks/clean/remove_filtered_master_domains.yml storage={{ item }}
+    - include_tasks: tasks/clean/remove_valid_filtered_master_domains.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
           loop_var: storage
 
     # We use inactive filter only at the end, since we are not sure if there were any storage domains
-    # which became inactive on the process or if there were any on the beginning.
+    # which became inactive on the process or if there were any at the beginning.
     - name: Set force remove flag to true for non master domains
       set_fact: dr_force=True
 
-    - name: Set query for remove invalid non master domains
-      # TODO: Filter only data and iso types
-      set_fact: dr_query_domain_search='type != glance and type != cinder and status != active'
-
     - name: Remove non master storage domains with invalid statuses using force remove
-    - include_tasks: tasks/clean/remove_filtered_master_domains.yml storage={{ item }}
+    - include_tasks: tasks/clean/remove_invalid_filtered_master_domains.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
           loop_var: storage
-
-    - name: Set query for remove valid master domains
-      # TODO: Filter only data and iso types
-      set_fact: dr_query_domain_search='type != cinder and status = active or type != glance and type != cinder and status = maintenance'
 
     - name: Set master storage domain filter
       set_fact: only_master=True
@@ -64,7 +66,7 @@
       set_fact: dr_force=False
 
     - name: Remove master storage domains with valid statuses
-    - include_tasks: tasks/clean/remove_filtered_master_domains.yml storage={{ item }}
+    - include_tasks: tasks/clean/remove_valid_filtered_master_domains.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -73,13 +75,8 @@
     - name: Set force remove flag to true for master domain
       set_fact: dr_force=True
 
-    # If by any chance we got storage domains which are inactive we force remove them.
-    - name: Set query for remove invalid master domains
-      # TODO: Filter only data and iso types
-      set_fact: dr_query_domain_search='type != glance and type != cinder and status != active'
-
     - name: Remove master storage domains with invalid statuses using force remove
-    - include_tasks: tasks/clean/remove_filtered_master_domains.yml storage={{ item }}
+    - include_tasks: tasks/clean/remove_invalid_filtered_master_domains.yml storage={{ item }}
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:

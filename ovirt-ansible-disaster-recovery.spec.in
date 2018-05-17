@@ -37,6 +37,17 @@ sh build.sh install
 %license LICENSE
 
 %changelog
+* Thu May 17 2018 Maor Lipchuk <mlipchuk@redhat.com> - 1.1-1
+- Add missing names to include tasks
+- Configure report file name on failover and failback
+- Add missing file of vault secret to be used for fail_back.py
+- Adjust Change default values in dr.conf
+- Exclude export SD in generator and validator
+- Bug 1575984 - Print failure message for failover and failback
+- Bug 1576553 - Fail back cleans storage domains which are not active, even if they are not written in the mapped var file
+- Bug 1576602 - Solve Missing dependencies, Make the script code compatible for RHEL
+- Bug 1574309 - Support Log and scripts
+
 * Thu May 3 2018 Ondra Machacek <omachace@redhat.com> - 0.4-1
 - Add ignore errors to all included tasks.
 - Require Ansible 2.5.

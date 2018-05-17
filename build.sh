@@ -1,7 +1,7 @@
 #!/bin/bash
 
-VERSION="0.4"
-MILESTONE=
+VERSION="1.1.0"
+MILESTONE=master
 RPM_RELEASE="1"
 
 ROLE_NAME="oVirt.disaster-recovery"

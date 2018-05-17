@@ -34,7 +34,7 @@ class ValidateMappingFile():
     aff_label_map = 'dr_affinity_label_mappings'
     network_map = 'dr_network_mappings'
 
-    def run(self, conf_file, log_file):
+    def run(self, conf_file):
         print("%s%sValidate variable mapping file "
               "for oVirt ansible disaster recovery%s"
               % (INFO,
@@ -788,4 +788,4 @@ class ConnectSDK:
 
 
 if __name__ == "__main__":
-    ValidateMappingFile().run('dr.conf', '/var/log/ovirt-dr/ovirt-dr.log')
+    ValidateMappingFile().run('dr.conf')

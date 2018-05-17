@@ -8,7 +8,7 @@
         fail: msg="No hosts available"
         when: ovirt_hosts.0 is undefined
     - block:
-      - name: Add NFS storage domain
+      - name: Add storage domain if NFS
         include_tasks: tasks/recover/add_nfs_domain.yml
         with_items:
           - "{{ storage }}"
@@ -16,7 +16,7 @@
         loop_control:
             loop_var: nfs_storage
 
-      - name: Add Gluster storage domain
+      - name: Add storage domain if Gluster
         include_tasks: tasks/recover/add_glusterfs_domain.yml
         with_items:
           - "{{ storage }}"
@@ -24,7 +24,7 @@
         loop_control:
             loop_var: gluster_storage
 
-      - name: Add posix storage domain
+      - name: Add storage domain if Posix
         include_tasks: tasks/recover/add_posixfs_domain.yml
         with_items:
           - "{{ storage }}"
@@ -32,7 +32,7 @@
         loop_control:
             loop_var: posix_storage
 
-      - name: Add iSCSI storage domain
+      - name: Add storage domain is scsi
         include_tasks: tasks/recover/add_iscsi_domain.yml
         with_items:
           - "{{ storage }}"
@@ -40,7 +40,7 @@
         loop_control:
             loop_var: iscsi_storage
 
-      - name: Add FCP storage domain
+      - name: Add storage domain if fcp
         include_tasks: tasks/recover/add_fcp_domain.yml
         with_items:
           - "{{ storage }}"

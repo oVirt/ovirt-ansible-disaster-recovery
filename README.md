@@ -59,12 +59,15 @@ There are four actions which the user can execute:
   failover	Start a failover process to the target setup
   failback	Start a failback process from the target setup to the source setup
 
-Each of those actions is using a configuration file which its default location is oVirt.disaster-recovery/files/dr.conf
+Each of those actions are using a configuration file which its default location is oVirt.disaster-recovery/files/dr.conf
+The configuration file location can be changed using --conf-file flag in the ovirt-dr script.
+Log file and log level can be configured as well through the ovirt-dr script using the flags --log-file and --log-level
+
 
 Example Script
 --------------
 For mapping file generation:
-  ./ovirt-dr generate
+  ./ovirt-dr generate --log-file=ovirt-dr.log --log-level=DEBUG
 For mapping file validation:
   ./ovirt-dr validate
 For fail-over operation:

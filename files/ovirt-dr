@@ -24,20 +24,21 @@ DEF_CONF_FILE = 'dr.conf'
 
 def main(argv):
     action, conf_file, log_file, log_level = _init_vars(argv)
-    log_file = log_file.format(int(round(time.time() * 1000)))
-    if log_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR']:
-        print("ovirt-dr: log level must be 'DEBUG' 'INFO' 'WARNING' 'ERROR'\n"
-              "Use 'ovirt-dr --help' for more information.")
-        sys.exit(2)
-
     while not os.path.isfile(conf_file):
         conf_file = raw_input(
             "Conf file '" + conf_file + "' does not exist."
             " Please provide the configuration file location: ")
 
-    create_log_dir(log_file)
-    if log_file is not None and log_file != '':
-        print("Log file: '%s'" % log_file)
+    if action != 'validate':
+        log_file = log_file.format(int(round(time.time() * 1000)))
+        if log_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR']:
+            print("ovirt-dr: log level must be 'DEBUG' 'INFO' 'WARNING' 'ERROR'\n"
+                  "Use 'ovirt-dr --help' for more information.")
+            sys.exit(2)
+
+        create_log_dir(log_file)
+        if log_file is not None and log_file != '':
+            print("Log file: '%s'" % log_file)
     if action == 'validate':
         validator.ValidateMappingFile().run(conf_file)
     elif action == 'generate':

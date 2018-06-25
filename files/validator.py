@@ -302,7 +302,9 @@ class ValidateMappingFile():
         _mappings = var_file.get(self.network_map)
         keys = self._key_setup(setup, self.network_map)
         for mapping in _mappings:
-            map_key = mapping[keys[0]] + "_" + mapping[keys[1]]
+            map_key = mapping[keys[0]] + \
+                      "_" + mapping[keys[1]] + \
+                      "_" + mapping[keys[2]]
             if (map_key in dups):
                 if keys[2] not in mapping:
                     print(
@@ -329,7 +331,9 @@ class ValidateMappingFile():
     def _get_network_dups(self, networks_setup):
         attributes = [attr['profile_name'] +
                       "_" +
-                      attr['network_name'] for attr in networks_setup]
+                      attr['network_name'] +
+                      "_" +
+                      attr['network_dc'] for attr in networks_setup]
         dups = [x for n, x in enumerate(attributes) if x in attributes[:n]]
         return dups
 
@@ -501,6 +505,7 @@ class ValidateMappingFile():
         _primary1 = set()
         key1_a = 'primary_profile_name'
         key1_b = 'primary_network_name'
+        key1_c = 'primary_network_dc'
         for x in _mapping:
             if (x[key1_a] is None or x[key1_b] is None):
                 print("%s%sNetwork '%s' is not initialized in map %s %s%s"
@@ -511,7 +516,10 @@ class ValidateMappingFile():
                          x[key1_b],
                          END))
                 exit()
-            map_key = x[key1_a] + "_" + x[key1_b]
+            primary_dc_name = ''
+            if (key1_c in x):
+                primary_dc_name = x[key1_c]
+            map_key = x[key1_a] + "_" + x[key1_b] + "_" + primary_dc_name
             if map_key in _primary1:
                 _return_set.add(map_key)
             else:
@@ -521,6 +529,7 @@ class ValidateMappingFile():
         _second1 = set()
         val1_a = 'secondary_profile_name'
         val1_b = 'secondary_network_name'
+        val1_c = 'secondary_network_dc'
         for x in _mapping:
             if (x[val1_a] is None or x[val1_b] is None):
                 print("%s%sThe following network mapping is not "
@@ -534,28 +543,15 @@ class ValidateMappingFile():
                          x[val1_b],
                          END))
                 exit()
-            map_key = x[val1_a] + "_" + x[val1_b]
+            secondary_dc_name = ''
+            if (val1_c in x):
+                secondary_dc_name = x[val1_c]
+            map_key = x[val1_a] + "_" + x[val1_b] + "_" + secondary_dc_name
             if map_key in _second1:
                 _return_set.add(map_key)
             else:
                 _second1.add(map_key)
 
-        # TODO:  Once vnic profile will be validated, delete:
-        #        Check for duplicates in primary_profile_id
-        #        _primary2 = set()
-        #        key = 'primary_profile_id'
-        #        _return_set.update(set(x[key]
-        #                               for x in
-        #                               _mapping if x[key]
-        #                               in _primary2 or _primary2.add(x[key])))
-        #
-        #        # Check for duplicates in secondary_profile_id
-        #        _second2 = set()
-        #        val = 'secondary_profile_id'
-        #        _return_set.update(set(x[val]
-        #                               for x in
-        #                               _mapping if x[val]
-        #                               in _second2 or _second2.add(x[val])))
         return _return_set
 
 

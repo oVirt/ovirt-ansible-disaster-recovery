@@ -94,6 +94,7 @@
               {
                   'source_network_name': item[dr_source_map + '_network_name'] | default('EMPTY_ELEMENT', true),
                   'source_profile_name': item[dr_source_map + '_profile_name'] | default('EMPTY_ELEMENT', true),
+                  'target_network_dc': item[dr_target_host + '_network_dc'] | default('EMPTY_ELEMENT', true),
                   'target_profile_id': item[dr_target_host + '_profile_id'] | default('00000000-0000-0000-0000-000000000000', true)
               }
           ] }}"

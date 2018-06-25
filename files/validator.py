@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from ansible.parsing.vault import VaultLib
 from bcolors import bcolors
 import collections
 from ConfigParser import SafeConfigParser
@@ -23,8 +22,6 @@ class ValidateMappingFile():
 
     def_var_file = "/var/lib/ovirt-ansible-disaster-" \
                    "recovery/mapping_vars.yml"
-    def_vault = "/var/lib/ovirt-ansible-disaster-" \
-                "recovery/passwords.yml"
     var_file = ""
     vault = ""
     cluster_map = 'dr_cluster_mappings'
@@ -53,17 +50,20 @@ class ValidateMappingFile():
                 (FAIL, PREFIX, self.var_file, END))
 
         python_vars = self._read_var_file()
-        vault_password = raw_input(
-            "%s%sPlease provide vault password for file '%s' "
-            "(For plain file, please press enter):%s " %
+        self.primary_pwd = raw_input(
+            "%s%sPlease provide password for the primary setup: %s" %
             (INPUT,
              PREFIX,
-             self.vault_file,
+             END))
+        self.second_pwd = raw_input(
+            "%s%sPlease provide password for the secondary setup: %s" %
+            (INPUT,
+             PREFIX,
              END))
 
         if (not self._validate_lists_in_mapping_file(python_vars) or
             not self._validate_duplicate_keys(python_vars) or not
-                self._entity_validator(python_vars, vault_password)):
+                self._entity_validator(python_vars)):
             self._print_finish_error()
             exit()
 
@@ -119,7 +119,6 @@ class ValidateMappingFile():
     def _set_dr_conf_variables(self, conf_file):
         _SECTION = 'validate_vars'
         _VAR_FILE = 'var_file'
-        _VAULT = 'vault'
 
         # Get default location of the yml var file.
         settings = SafeConfigParser()
@@ -142,25 +141,7 @@ class ValidateMappingFile():
                                                self.def_var_file,
                                                END) or self.def_var_file)
 
-        if not settings.has_option(_SECTION, _VAULT):
-            settings.set(_SECTION, _VAULT, '')
-        vault_file = settings.get(
-            _SECTION,
-            _VAULT,
-            vars=DefaultOption(
-                settings,
-                _SECTION,
-                site=self.def_vault))
-
-        # If no default location exists, get the location from the user.
-        while (not vault_file):
-            vault_file = raw_input(
-                "%s%sPasswords file is not initialized. "
-                "Please provide the location of the passwords file "
-                "(%s):%s " %
-                (WARN, PREFIX, self.def_vault, END) or self.def_vault)
         self.var_file = var_file
-        self.vault_file = vault_file
 
     def _print_duplicate_keys(self, duplicates, keys):
         ret_val = False
@@ -177,12 +158,12 @@ class ValidateMappingFile():
                 ret_val = True
         return ret_val
 
-    def _entity_validator(self, python_vars, vault_password):
+    def _entity_validator(self, python_vars):
         isValid = True
         ovirt_setups = ConnectSDK(
             python_vars,
-            self.vault_file,
-            vault_password)
+            self.primary_pwd,
+            self.second_pwd)
         isValid = ovirt_setups.validate_primary() and isValid
         isValid = ovirt_setups.validate_secondary() and isValid
         if isValid:
@@ -597,13 +578,13 @@ class DefaultOption(dict):
 
 
 class ConnectSDK:
-    primary_url, primary_user, primary_ca, primary_password = '', '', '', ''
-    second_url, second_user, second_ca, second_password = '', '', '', ''
+    primary_url, primary_user, primary_ca = '', '', ''
+    second_url, second_user, second_ca = '', '', ''
     prefix = ''
     error_msg = "%s%s The '%s' field in the %s setup is not " \
                 "initialized in var file mapping.%s"
 
-    def __init__(self, var_file, pass_file, vault_password):
+    def __init__(self, var_file, primary_pwd, second_pwd):
         """
         ---
         dr_sites_primary_url: http://xxx.xx.xx.xxx:8080/ovirt-engine/api
@@ -621,43 +602,8 @@ class ConnectSDK:
         self.second_url = var_file.get('dr_sites_secondary_url')
         self.second_user = var_file.get('dr_sites_secondary_username')
         self.second_ca = var_file.get('dr_sites_secondary_ca_file')
-
-        if (vault_password != ''):
-            vault = VaultLib(vault_password)
-            try:
-                passwords = vault.decrypt(open(pass_file).read())
-                self.primary_password = passwords['dr_sites_primary_password']
-                self.second_password = passwords['dr_sites_secondary_password']
-            except BaseException:
-                try:
-                    print("%s%sCan not read passwords from vault."
-                          " Will try to read as plain file.%s"
-                          % (WARN,
-                             PREFIX,
-                             END))
-                    self._plain_read(pass_file)
-                except BaseException:
-                    print("%s%sCan not read passwords from file%s"
-                          % (FAIL,
-                             PREFIX,
-                             END))
-        else:
-            try:
-                self._plain_read(pass_file)
-            except BaseException:
-                print("%s%sCan not read passwords from file%s"
-                      % (FAIL,
-                         PREFIX,
-                         END))
-
-    def _plain_read(self, pass_file):
-        with open(pass_file) as file:
-            passwords = file.read()
-            info_dict = yaml.load(passwords)
-            self.primary_password = \
-                info_dict['dr_sites_primary_password']
-            self.second_password = \
-                info_dict['dr_sites_secondary_password']
+        self.primary_pwd = primary_pwd
+        self.second_pwd = second_pwd
 
     def validate_primary(self):
         isValid = True
@@ -674,14 +620,6 @@ class ConnectSDK:
                   FAIL,
                   PREFIX,
                   "username",
-                  "primary",
-                  END))
-            isValid = False
-        if self.primary_password is None:
-            print(self.error_msg % (
-                  FAIL,
-                  PREFIX,
-                  "password",
                   "primary",
                   END))
             isValid = False
@@ -710,14 +648,6 @@ class ConnectSDK:
                   FAIL,
                   PREFIX,
                   "username",
-                  "secondary",
-                  END))
-            isValid = False
-        if self.second_password is None:
-            print(self.error_msg % (
-                  FAIL,
-                  PREFIX,
-                  "password",
                   "secondary",
                   END))
             isValid = False
@@ -768,13 +698,13 @@ class ConnectSDK:
     def connect_primary(self):
         return self._validate_connection(self.primary_url,
                                          self.primary_user,
-                                         self.primary_password,
+                                         self.primary_pwd,
                                          self.primary_ca)
 
     def connect_secondary(self):
         return self._validate_connection(self.second_url,
                                          self.second_user,
-                                         self.second_password,
+                                         self.second_pwd,
                                          self.second_ca)
 
     def _connect_sdk(self, url, username, password, ca):

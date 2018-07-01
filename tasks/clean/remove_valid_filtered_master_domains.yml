@@ -1,7 +1,9 @@
 - block:
     - name: Fetch active/maintenance/detached storage domain for remove
       ovirt_storage_domains_facts:
-          pattern:  name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_active_domain_search }} or name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_maintenance_domain_search }} or name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_unattached_domain_search }}
+          pattern:  name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_active_domain_search }}
+                    or name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_maintenance_domain_search }}
+                    or name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_unattached_domain_search }}
           auth: "{{ ovirt_auth }}"
 
     - name: Remove valid storage domain

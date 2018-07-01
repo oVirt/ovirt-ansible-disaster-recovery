@@ -1,7 +1,11 @@
 - block:
     - name: Fetch invalid storage domain for remove
       ovirt_storage_domains_facts:
+          # BZ1589535 - storage domains which fail to be removed gracefully due to VMs in Preview
+          # or VMs which are delete protected should be retried with the force removed flag
+          # That is why we also try to force remove storage domain in maintenance.
           pattern:  name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_inactive_domain_search }}
+                    or name={{ storage['dr_' + dr_source_map + '_name'] }} and {{ dr_maintenance_domain_search }}
           auth: "{{ ovirt_auth }}"
 
     - name: Remove invalid storage domain

@@ -37,28 +37,34 @@ def main(argv):
             sys.exit(2)
 
         create_log_dir(log_file)
-        if log_file is not None and log_file != '':
-            print("Log file: '%s'" % log_file)
+        _print_log_file_name(log_file)
     if action == 'validate':
         validator.ValidateMappingFile().run(conf_file)
     elif action == 'generate':
         generate_vars.GenerateMappingFile().run(conf_file,
                                                 log_file,
                                                 logg.getLevelName(log_level))
+        _print_log_file_name(log_file)
     elif action == 'failover':
         fail_over.FailOver().run(conf_file,
                                  log_file,
                                  logg.getLevelName(log_level))
+        _print_log_file_name(log_file)
     elif action == 'failback':
         fail_back.FailBack().run(conf_file,
                                  log_file,
                                  logg.getLevelName(log_level))
+        _print_log_file_name(log_file)
     elif action == '--help':
         help_log()
     else:
         print "\tError: action '%s' is not defined" % action
         help_log()
 
+
+def _print_log_file_name(log_file):
+    if log_file is not None and log_file != '':
+        print("Log file: '%s'" % log_file)
 
 def _init_vars(argv):
     conf_file = DEF_CONF_FILE

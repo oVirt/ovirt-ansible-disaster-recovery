@@ -37,16 +37,21 @@ sh build.sh install
 %license LICENSE
 
 %changelog
-* Thu May 17 2018 Maor Lipchuk <mlipchuk@redhat.com> - 1.1-1
+* Thu Jul 19 2018 Maor Lipchuk <mlipchuk@redhat.com> - 1.1.1-1
+- rhbz#1576934 - Support dc name for vnic profile mapping
+- rhbz#1588557 - Avoid using VaultLib
+- rhbz#1589535 - Log file should not be part of validate task
+
+* Thu May 17 2018 Maor Lipchuk <mlipchuk@redhat.com> - 1.1.0-1
 - Add missing names to include tasks
 - Configure report file name on failover and failback
 - Add missing file of vault secret to be used for fail_back.py
 - Adjust Change default values in dr.conf
 - Exclude export SD in generator and validator
-- Bug 1575984 - Print failure message for failover and failback
-- Bug 1576553 - Fail back cleans storage domains which are not active, even if they are not written in the mapped var file
-- Bug 1576602 - Solve Missing dependencies, Make the script code compatible for RHEL
-- Bug 1574309 - Support Log and scripts
+- rhbz#1575984 - Print failure message for failover and failback
+- rhbz#1576553 - Fail back cleans storage domains which are not active, even if they are not written in the mapped var file
+- rhbz#1576602 - Solve Missing dependencies, Make the script code compatible for RHEL
+- rhbz#1574309 - Support Log and scripts
 
 * Thu May 3 2018 Ondra Machacek <omachace@redhat.com> - 0.4-1
 - Add ignore errors to all included tasks.

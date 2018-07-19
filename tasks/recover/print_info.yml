@@ -8,7 +8,8 @@
       shell: cat /tmp/{{ dr_report_file }}
       register: content
 
-    - debug: msg="{{ content.stdout_lines | quote }}"
+    - name: Pring report file to stdout
+      debug: msg="{{ content.stdout_lines | quote }}"
   tags:
       - fail_over
       - fail_back

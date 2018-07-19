@@ -1,5 +1,5 @@
 - block:
-  - name: register VMs
+  - name: Register VMs
     ovirt_vms:
         state: registered
         storage_domain: "{{ storage.name }}"

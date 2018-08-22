@@ -183,11 +183,19 @@ class ValidateMappingFile():
                 isValid = self._validate_entities_in_setup(
                     second_conn, 'secondary', python_vars) and isValid
                 cluster_mapping = python_vars.get(self.cluster_map)
-                if isValid:
-                    isValid = self._is_compatible_versions(primary_conn,
-                                                           second_conn,
-                                                           ovirt_setups,
-                                                           cluster_mapping)
+                isValid = isValid and self._validate_vms_for_failback(
+                                          primary_conn,
+                                          "primary",
+                                          ovirt_setups)
+                isValid = isValid and self._validate_vms_for_failback(
+                                          second_conn,
+                                          "secondary",
+                                          ovirt_setups)
+                isValid = isValid and self._is_compatible_versions(
+                                          primary_conn,
+                                          second_conn,
+                                          ovirt_setups,
+                                          cluster_mapping)
             finally:
                 # Close the connections
                 if primary_conn:
@@ -483,6 +491,43 @@ class ValidateMappingFile():
             duplicates, [clusters, domains, roles, aff_group,
                          aff_label, network])) and isValid
         return isValid
+
+    def _validate_vms_for_failback(self,
+                                   setup_conn,
+                                   setup_type,
+                                   var_file):
+        vms_in_preview = []
+        vms_delete_protected = []
+        service_setup = setup_conn.system_service().vms_service()
+        for vm in service_setup.list():
+            vm_service = service_setup.vm_service(vm.id)
+            if vm.delete_protected:
+                vms_delete_protected.append(vm.name)
+            snapshots_service = vm_service.snapshots_service()
+            for snapshot in snapshots_service.list():
+                if (snapshot.snapshot_status == types.SnapshotStatus.IN_PREVIEW):
+                    vms_in_preview.append(vm.name)
+        if len(vms_in_preview) > 0:
+            print("%s%sFailback process does not support VMs in preview."
+                  " The '%s' setup contains the following previewed vms:"
+                  " '%s'%s"
+                      % (FAIL,
+                         PREFIX,
+                         setup_type,
+                         vms_in_preview,
+                         END))
+            return False
+        if len(vms_delete_protected) > 0:
+            print("%s%sFailback process does not support delete protected"
+                  " VMs. The '%s' setup contains the following vms:"
+                  " '%s'%s"
+                      % (FAIL,
+                         PREFIX,
+                         setup_type,
+                         vms_delete_protected,
+                         END))
+            return False
+        return True
 
     def _is_compatible_versions(self,
                                 primary_conn,

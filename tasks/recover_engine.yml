@@ -8,13 +8,15 @@
       ignore_errors: False
 
     - name: Delete previous report log
-      shell: rm /tmp/{{ dr_report_file }}
+      file:
+          path: "/tmp/{{ dr_report_file }}"
+          state: absent
       ignore_errors: True
 
     - name: Create report file
       file:
-        path: /tmp/{{ dr_report_file }}
-        state: touch
+          path: "/tmp/{{ dr_report_file }}"
+          state: touch
 
     - name: Init entity status list
       set_fact:

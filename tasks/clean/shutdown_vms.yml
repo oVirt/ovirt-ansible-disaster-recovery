@@ -2,7 +2,7 @@
     # Get all the running VMs related to a storage domain and shut them down
     - name: Fetch VMs in the storage domain
       ovirt_vms_facts:
-          pattern:  status != down and storage.name={{ storage['dr_' + dr_source_map + '_name'] }}
+          pattern:  status != down and storage.name={{ storage['dr_' + dr_source_map + '_name'] }} and datacenter={{ storage['dr_' + dr_source_map + '_dc_name'] }}
           auth: "{{ ovirt_auth }}"
 
     # TODO: Add a wait until the VM is really down

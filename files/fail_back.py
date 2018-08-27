@@ -77,7 +77,8 @@ class FailBack():
 
         # Setting vault password
         vault_pass = raw_input(
-            INPUT + PREFIX + "Please enter the vault password: " + END)
+            INPUT + PREFIX + "Please enter vault password (In case of "
+            "plain text please press ENTER): " + END)
         os.system("export vault_password=\"" + vault_pass + "\"")
         log.info("Starting cleanup process of setup %s"
                  " for oVirt ansible disaster recovery" % target_host)

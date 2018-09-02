@@ -22,8 +22,10 @@ class ValidateMappingFile():
 
     def_var_file = "/var/lib/ovirt-ansible-disaster-" \
                    "recovery/mapping_vars.yml"
+    default_main_file = "../defaults/main.yml"
     var_file = ""
     vault = ""
+    running_vms = "dr_running_vms"
     cluster_map = 'dr_cluster_mappings'
     domain_map = 'dr_import_storages'
     role_map = 'dr_role_mappings'
@@ -63,7 +65,8 @@ class ValidateMappingFile():
 
         if (not self._validate_lists_in_mapping_file(python_vars) or
             not self._validate_duplicate_keys(python_vars) or not
-                self._entity_validator(python_vars)):
+                self._entity_validator(python_vars) or not
+                self._validate_failback_leftovers()):
             self._print_finish_error()
             exit()
 
@@ -105,7 +108,7 @@ class ValidateMappingFile():
                  END))
 
     def _print_finish_success(self):
-        print("%s%sFinished validation variable mapping file "
+        print("%s%sFinished validation of variable mapping file "
               "for oVirt ansible disaster recovery%s"
               % (INFO,
                  PREFIX,
@@ -180,11 +183,19 @@ class ValidateMappingFile():
                 isValid = self._validate_entities_in_setup(
                     second_conn, 'secondary', python_vars) and isValid
                 cluster_mapping = python_vars.get(self.cluster_map)
-                if isValid:
-                    isValid = self._is_compatible_versions(primary_conn,
-                                                           second_conn,
-                                                           ovirt_setups,
-                                                           cluster_mapping)
+                isValid = isValid and self._validate_vms_for_failback(
+                                          primary_conn,
+                                          "primary",
+                                          ovirt_setups)
+                isValid = isValid and self._validate_vms_for_failback(
+                                          second_conn,
+                                          "secondary",
+                                          ovirt_setups)
+                isValid = isValid and self._is_compatible_versions(
+                                          primary_conn,
+                                          second_conn,
+                                          ovirt_setups,
+                                          cluster_mapping)
             finally:
                 # Close the connections
                 if primary_conn:
@@ -193,6 +204,57 @@ class ValidateMappingFile():
                     second_conn.close()
 
         return isValid
+
+    def _validate_failback_leftovers(self):
+        valid = {"yes": True, "y": True, "ye": True,
+                 "no": False, "n": False}
+        with open(self.default_main_file, 'r') as stream:
+            try:
+                info_dict = yaml.load(stream)
+                running_vms_file = info_dict.get(self.running_vms)
+                if os.path.isfile(running_vms_file):
+                    ans = raw_input(
+                        "%s%sFile with running vms info already exists from "
+                        "previous failback operation. Do you want to "
+                        "delete it(yes,no)?: %s" %
+                        (WARN,
+                         PREFIX,
+                         END))
+                    ans = ans.lower()
+                    if ans in valid and valid[ans]:
+                        os.remove(running_vms_file)
+                        print("%s%sFile '%s' has been deleted"
+                              " successfully%s" %
+                              (INFO,
+                               PREFIX,
+                               running_vms_file,
+                               END))
+                    else:
+                        print("%s%sFile '%s' has not been deleted."
+                              " It will be used in the next failback"
+                              " operation%s" %
+                              (INFO,
+                               PREFIX,
+                               running_vms_file,
+                               END))
+
+            except yaml.YAMLError as exc:
+                print("%s%syaml file '%s' could not be loaded%s"
+                      % (FAIL,
+                         PREFIX,
+                         self.default_main_file,
+                         END))
+                print(exc)
+                return False
+            except OSError as ex:
+                print("%s%sFail to validate failback running vms file '%s'%s"
+                      % (FAIL,
+                         PREFIX,
+                         self.default_main_file,
+                         END))
+                print(ex)
+                return False
+        return True
 
     def _validate_entities_in_setup(self, conn, setup, python_vars):
         isValid = True
@@ -429,6 +491,43 @@ class ValidateMappingFile():
             duplicates, [clusters, domains, roles, aff_group,
                          aff_label, network])) and isValid
         return isValid
+
+    def _validate_vms_for_failback(self,
+                                   setup_conn,
+                                   setup_type,
+                                   var_file):
+        vms_in_preview = []
+        vms_delete_protected = []
+        service_setup = setup_conn.system_service().vms_service()
+        for vm in service_setup.list():
+            vm_service = service_setup.vm_service(vm.id)
+            if vm.delete_protected:
+                vms_delete_protected.append(vm.name)
+            snapshots_service = vm_service.snapshots_service()
+            for snapshot in snapshots_service.list():
+                if (snapshot.snapshot_status == types.SnapshotStatus.IN_PREVIEW):
+                    vms_in_preview.append(vm.name)
+        if len(vms_in_preview) > 0:
+            print("%s%sFailback process does not support VMs in preview."
+                  " The '%s' setup contains the following previewed vms:"
+                  " '%s'%s"
+                      % (FAIL,
+                         PREFIX,
+                         setup_type,
+                         vms_in_preview,
+                         END))
+            return False
+        if len(vms_delete_protected) > 0:
+            print("%s%sFailback process does not support delete protected"
+                  " VMs. The '%s' setup contains the following vms:"
+                  " '%s'%s"
+                      % (FAIL,
+                         PREFIX,
+                         setup_type,
+                         vms_delete_protected,
+                         END))
+            return False
+        return True
 
     def _is_compatible_versions(self,
                                 primary_conn,

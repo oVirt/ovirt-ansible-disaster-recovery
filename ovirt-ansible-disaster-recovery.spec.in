@@ -37,10 +37,6 @@ sh build.sh install
 %license LICENSE
 
 %changelog
-* Thu Sep 12 2018 Maor Lipchuk <mlipchuk@redhat.com> - 1.1.2-1
-- rhbz#1533404 - Support unregistered entities in file
-- rhbz#1589535 - Support validation for previewed VMs and delete protected VMs
-
 * Thu Jul 19 2018 Maor Lipchuk <mlipchuk@redhat.com> - 1.1.1-1
 - rhbz#1576934 - Support dc name for vnic profile mapping
 - rhbz#1588557 - Avoid using VaultLib

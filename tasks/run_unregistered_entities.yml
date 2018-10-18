@@ -15,12 +15,16 @@
           state: absent
 
     - name: Run all the high availability VMs
-      include_tasks: tasks/recover/run_vms.yml vms={{ item }}
+      include_tasks: tasks/recover/run_vms.yml
+      vars:
+          vms: "{{ item }}"
       with_items: "{{ running_vms_fail_back }}"
       when: item.high_availability.enabled | bool
 
     - name: Run all the entire running VMs
-      include_tasks: tasks/recover/run_vms.yml vms={{ item }}
+      include_tasks: tasks/recover/run_vms.yml
+      vars:
+          vms: "{{ item }}"
       with_items: "{{ running_vms_fail_back }}"
       when: not item.high_availability.enabled | bool
 
@@ -29,7 +33,7 @@
   ignore_errors: "{{ dr_ignore_error_clean }}"
   tags:
       - fail_back
-- always:
+  always:
     - name: Revoke the SSO token
       ovirt_auth:
           state: absent

@@ -7,14 +7,18 @@
           ca_file: "{{ vars['dr_sites_' + dr_source_map + '_ca_file'] }}"
 
     - name: Shutdown running VMs
-      include_tasks: tasks/clean/shutdown_vms.yml storage={{ item }}
+      include_tasks: tasks/clean/shutdown_vms.yml
+      vars:
+          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
           loop_var: storage
 
     - name: Update OVF_STORE disk for storage domains
-      include_tasks: tasks/clean/update_ovf_store.yml storage={{ item }}
+      include_tasks: tasks/clean/update_ovf_store.yml
+      vars:
+          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -36,7 +40,9 @@
       set_fact: only_master=False
 
     - name: Remove non master storage domains with valid statuses
-      include_tasks: tasks/clean/remove_valid_filtered_master_domains.yml storage={{ item }}
+      include_tasks: tasks/clean/remove_valid_filtered_master_domains.yml
+      vars:
+          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -48,7 +54,9 @@
       set_fact: dr_force=True
 
     - name: Remove non master storage domains with invalid statuses using force remove
-      include_tasks: tasks/clean/remove_invalid_filtered_master_domains.yml storage={{ item }}
+      include_tasks: tasks/clean/remove_invalid_filtered_master_domains.yml
+      vars:
+          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -61,7 +69,9 @@
       set_fact: dr_force=False
 
     - name: Remove master storage domains with valid statuses
-      include_tasks: tasks/clean/remove_valid_filtered_master_domains.yml storage={{ item }}
+      include_tasks: tasks/clean/remove_valid_filtered_master_domains.yml
+      vars:
+          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -71,7 +81,9 @@
       set_fact: dr_force=True
 
     - name: Remove master storage domains with invalid statuses using force remove
-      include_tasks: tasks/clean/remove_invalid_filtered_master_domains.yml storage={{ item }}
+      include_tasks: tasks/clean/remove_invalid_filtered_master_domains.yml
+      vars:
+          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -91,7 +103,9 @@
       when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0
 
     - name: Remove vms if no storage domains left in setup
-      include_tasks: tasks/clean/remove_vms.yml vm={{ item }}
+      include_tasks: tasks/clean/remove_vms.yml
+      vars:
+          vm: "{{ item }}"
       with_items: "{{ ovirt_vms }}"
       when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0
 
@@ -103,7 +117,9 @@
       when: dr_clean_orphaned_disks and ovirt_storage_domains | length == 0
 
     - name: Remove LUN disks if no storage domains left in setup
-      include_tasks: tasks/clean/remove_disks.yml disk={{ item }}
+      include_tasks: tasks/clean/remove_disks.yml
+      vars:
+          disk: "{{ item }}"
       with_items: "{{ ovirt_disks }}"
       when: dr_clean_orphaned_disks and ovirt_storage_domains | length == 0
 
@@ -114,7 +130,7 @@
       - fail_back
       - clean_engine
 
-- always:
+  always:
     - name: Revoke the SSO token
       ovirt_auth:
           state: absent

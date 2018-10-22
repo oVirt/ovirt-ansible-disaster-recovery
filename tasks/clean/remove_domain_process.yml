@@ -31,11 +31,15 @@
       when: sp_uuid
 
     - name: Remove storage domain with no force
-      include_tasks: tasks/clean/remove_domain.yml host={{ ovirt_hosts[0].id }}
+      include_tasks: tasks/clean/remove_domain.yml
+      vars:
+          host: "{{ ovirt_hosts[0].id }}"
       when: "ovirt_hosts is defined and ovirt_hosts|length > 0 and not dr_force"
 
     - name: Force remove storage domain
-      include_tasks: tasks/clean/remove_domain.yml host="00000000-0000-0000-0000-000000000000"
+      include_tasks: tasks/clean/remove_domain.yml
+      vars:
+          host: "00000000-0000-0000-0000-000000000000"
       when: "dr_force"
   ignore_errors: "{{ dr_ignore_error_clean }}"
   tags:

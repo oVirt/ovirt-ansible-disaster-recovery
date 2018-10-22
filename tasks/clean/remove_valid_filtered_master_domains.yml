@@ -7,7 +7,9 @@
           auth: "{{ ovirt_auth }}"
 
     - name: Remove valid storage domain
-      include_tasks: tasks/clean/remove_domain_process.yml sd={{ sd }}
+      include_tasks: tasks/clean/remove_domain_process.yml
+      vars:
+          sd: "{{ sd }}"
       with_items:
           - "{{ ovirt_storage_domains }}"
       when: (not only_master and not sd.master) or (only_master and sd.master)

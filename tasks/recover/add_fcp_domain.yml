@@ -1,6 +1,6 @@
 - block:
     - name: Import FCP storage domain
-      ovirt_storage_domains:
+      ovirt_storage_domain:
           state: imported
           id: "{{ fcp_storage['dr_domain_id'] }}"
           name: "{{ fcp_storage['dr_' + dr_target_host + '_name']|default('') }}"

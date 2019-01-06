@@ -1,6 +1,6 @@
 - block:
     - name: Register unregistered Template
-      ovirt_templates:
+      ovirt_template:
           state: registered
           storage_domain: "{{ storage.name }}"
           id: "{{ unreg_template.id }}"

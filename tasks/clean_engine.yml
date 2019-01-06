@@ -90,14 +90,14 @@
           loop_var: storage
 
     - name: Fetch leftover storage domains
-      ovirt_storage_domains_facts:
+      ovirt_storage_domain_facts:
           pattern: type != glance
           auth: "{{ ovirt_auth }}"
 
     # TODO: Document that behavior
     # Remove VMs only if there are no data storage domains left in the setup
     - name: Fetch leftover VMs in the setup
-      ovirt_vms_facts:
+      ovirt_vm_facts:
           pattern: status = down
           auth: "{{ ovirt_auth }}"
       when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0

@@ -58,7 +58,7 @@
     # Get all the active storage domains in the setup to register
     # all the templates/VMs/Disks
     - name: Fetching active storage domains
-      ovirt_storage_domains_facts:
+      ovirt_storage_domain_facts:
           pattern: "status=active"
           auth: "{{ ovirt_auth }}"
 

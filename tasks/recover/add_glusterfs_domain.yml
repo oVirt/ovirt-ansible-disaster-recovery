@@ -1,6 +1,6 @@
 - block:
     - name: Add Gluster storage domain
-      ovirt_storage_domains:
+      ovirt_storage_domain:
           name: "{{ gluster_storage['dr_' + dr_target_host + '_name'] }}"
           critical_space_action_blocker: "{{ gluster_storage['dr_critical_space_action_blocker'] }}"
           domain_function: "{{ gluster_storage['dr_storage_domain_type'] }}"

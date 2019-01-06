@@ -13,13 +13,13 @@
       when: sd.data_centers is not defined
 
     - name: Detached storage domain - Fetch active host for remove
-      ovirt_hosts_facts:
+      ovirt_host_facts:
         pattern: "status=up"
         auth: "{{ ovirt_auth }}"
       when: sd.data_centers is not defined
 
     - name: Attached storage domain - Fetch active host for remove
-      ovirt_hosts_facts:
+      ovirt_host_facts:
         pattern: "status=up and storage={{ sd.name }}"
         auth: "{{ ovirt_auth }}"
       when: sd.data_centers is defined

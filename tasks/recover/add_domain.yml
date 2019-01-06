@@ -1,6 +1,6 @@
 - block:
     - name: Fetch available hosts in data center
-      ovirt_hosts_facts:
+      ovirt_host_facts:
           pattern: "status=up and datacenter={{ storage['dr_' + dr_target_host + '_dc_name'] }}"
           auth: "{{ ovirt_auth }}"
     - block:

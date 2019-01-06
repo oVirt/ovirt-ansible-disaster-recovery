@@ -3,7 +3,7 @@
     # Every connect should be done using a different ip
     - block:
       - name: Login to iSCSI targets
-        ovirt_hosts:
+        ovirt_host:
             state: iscsilogin
             name: "{{ ovirt_hosts[0].name }}"
             auth: "{{ ovirt_auth }}"
@@ -20,7 +20,7 @@
            loop_var: dr_target
 
       - name: Import iSCSI storage domain
-        ovirt_storage_domains:
+        ovirt_storage_domain:
             state: imported
             id: "{{ iscsi_storage['dr_domain_id'] }}"
             name: "{{ iscsi_storage['dr_' + dr_target_host + '_name']|default('') }}"
@@ -37,7 +37,7 @@
                 username: "{{ iscsi_storage['dr_' + dr_target_host + '_username']|default('') }}"
                 password: "{{ iscsi_storage['dr_' + dr_target_host + '_password']|default('') }}"
                 address: "{{ iscsi_storage['dr_' + dr_target_host + '_address'] }}"
-                # We use target since state imported in ovirt_storage_domains.py creates a storage domain
+                # We use target since state imported in ovirt_storage_domain.py creates a storage domain
                 # which calls login, therfore we must have a target althout the targets were already connected before.
                 # Therefore passing the first target in the list as a transient target.
                 target: "{{ dr_target }}"

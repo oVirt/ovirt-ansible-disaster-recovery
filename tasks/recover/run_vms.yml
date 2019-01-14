@@ -1,6 +1,6 @@
 - block:
     - name: Run VMs
-      ovirt_vms:
+      ovirt_vm:
           state: running
           name: "{{ vms.name }}"
           wait: False

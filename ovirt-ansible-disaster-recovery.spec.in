@@ -12,7 +12,7 @@ Group:          Virtualization/Management
 BuildArch:      noarch
 Url:            http://www.ovirt.org
 
-Requires: ansible >= 2.5
+Requires: ansible >= 2.7.2
 
 %description
 This Ansible role provide funtionality to perform disaster recovery for oVirt engine.
@@ -37,6 +37,11 @@ sh build.sh install
 %license LICENSE
 
 %changelog
+* Thu Jan 10 2019 Eyal Shenitzky <eshenitz@redhat.com> - 1.1.4-1
+- Rename all tasks module calls from plural to singular
+- Use ovirt_vm.py module from Ansible lib instead local lib ovirt_vms.py module
+- Required Ansible >= 2.7.2
+
 * Thu Oct 31 2018 Maor Lipchuk <mlipchuk@redhat.com> - 1.1.3-1
 - rhbz#1640155 - Use vars instead of inline variables for include_tasks
 

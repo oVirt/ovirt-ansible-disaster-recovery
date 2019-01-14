@@ -2,7 +2,7 @@
     # If we get the exception "Cannot deactivate Master Data Domain while there are running tasks on its Data Center."
     # We should wait for some time and try again
     - name: Remove storage domain
-      ovirt_storage_domains:
+      ovirt_storage_domain:
           state: absent
           id: "{{ sd.id }}"
           name: "{{ sd.name }}"

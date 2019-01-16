@@ -38,7 +38,7 @@ sh build.sh install
 
 %changelog
 * Thu Jan 10 2019 Eyal Shenitzky <eshenitz@redhat.com> - 1.1.4-1
-- Rename all tasks module calls from plural to singular
+- Rename all tasks module calls from plural to singular to support ansible 2.7.2
 - Use ovirt_vm.py module from Ansible lib instead local lib ovirt_vms.py module
 - Required Ansible >= 2.7.2
 

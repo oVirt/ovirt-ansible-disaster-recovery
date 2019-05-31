@@ -3,7 +3,6 @@ from bcolors import bcolors
 from ConfigParser import SafeConfigParser
 import logging
 import os.path
-import shlex
 import subprocess
 import sys
 import time
@@ -68,9 +67,14 @@ class FailBack():
         cmd_fb.append("-e")
         cmd_fb.append("@" + vault)
         cmd_fb.append("-e")
-        cmd_fb.append(" dr_target_host=" + target_host +
-                      " dr_source_map=" + source_map +
-                      " dr_report_file=" + report)
+        cmd_fb.append(
+            " dr_target_host={th} dr_source_map={sm} "
+            "dr_report_file={r}".format(
+                th=target_host,
+                sm=source_map,
+                r=report
+            )
+        )
         cmd_fb.append("--vault-password-file")
         cmd_fb.append("vault_secret.sh")
         cmd_fb.append("-vvv")
@@ -160,9 +164,9 @@ class FailBack():
 
     def _handle_result(self, subprocess, cmd):
         try:
-            proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+            subprocess.check_output(cmd, stderr=subprocess.STDOUT)
             # do something with output
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError as e:
             print("%sException: %s\n\n"
                   "failback operation failed, please check log file for "
                   "further details.%s"

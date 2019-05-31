@@ -5,11 +5,9 @@ from ConfigParser import SafeConfigParser
 import logging
 import os.path
 import ovirtsdk4 as sdk
-import shlex
 import subprocess
 import sys
 
-from subprocess import call
 
 INFO = bcolors.OKGREEN
 INPUT = bcolors.OKGREEN

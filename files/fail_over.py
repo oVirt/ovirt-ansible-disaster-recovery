@@ -3,7 +3,6 @@ from bcolors import bcolors
 from ConfigParser import SafeConfigParser
 import logging
 import os.path
-import shlex
 import subprocess
 import sys
 import time
@@ -53,8 +52,13 @@ class FailOver():
         cmd.append("@" + vault)
         cmd.append("-e")
         cmd.append(
-            " dr_target_host=" + target_host + " dr_source_map=" + source_map +
-            " dr_report_file=" + report)
+            " dr_target_host={th} dr_source_map={sm} "
+            "dr_report_file={r}".format(
+                th=target_host,
+                sm=source_map,
+                r=report
+            )
+        )
         cmd.append("--vault-password-file")
         cmd.append("vault_secret.sh")
         cmd.append("-vvv")
@@ -93,8 +97,8 @@ class FailOver():
 
     def _handle_result(self, cmd):
         try:
-            proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError, e:
+            subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
             print("%sException: %s\n\n"
                   "failover operation failed, please check log file for "
                   "further details.%s"

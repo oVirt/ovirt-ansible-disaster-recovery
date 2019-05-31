@@ -1,10 +1,7 @@
-import subprocess
 import pexpect
 import os
 
 from contextlib import contextmanager
-
-import pytest
 
 
 @contextmanager

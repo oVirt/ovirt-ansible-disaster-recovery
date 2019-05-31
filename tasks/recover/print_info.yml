@@ -1,3 +1,4 @@
+---
 - block:
     - name: Generate log file through template
       template:
@@ -5,12 +6,11 @@
         dest: /tmp/{{ dr_report_file }}
 
     - name: Print report file
-      shell: cat /tmp/{{ dr_report_file }}
+      command: cat /tmp/{{ dr_report_file }}
       register: content
 
     - name: Pring report file to stdout
       debug: msg="{{ content.stdout_lines | quote }}"
   tags:
-      - fail_over
-      - fail_back
-
+    - fail_over
+    - fail_back

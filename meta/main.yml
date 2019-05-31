@@ -11,5 +11,5 @@ galaxy_info:
         - 7
     - name: Fedora
       versions:
-      - all
+        - all
   galaxy_tags: [ovirt, rhv, rhev, virtualization]

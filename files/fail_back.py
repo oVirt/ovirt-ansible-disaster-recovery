@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from six.moves import input
+
 from bcolors import bcolors
 from ConfigParser import SafeConfigParser
 import logging
@@ -76,7 +78,7 @@ class FailBack():
         cmd_fb.append("-vvv")
 
         # Setting vault password
-        vault_pass = raw_input(
+        vault_pass = input(
             INPUT + PREFIX + "Please enter vault password (In case of "
             "plain text please press ENTER): " + END)
         os.system("export vault_password=\"" + vault_pass + "\"")
@@ -223,40 +225,31 @@ class FailBack():
                                                        _SECTION,
                                                        ansible_play=None))
         while target_host not in setups:
-            target_host = raw_input(
+            target_host = input(
                 INPUT + PREFIX + "The target setup was not defined. "
                 "Please provide the setup which it is failback to "
                 "(primary or secondary): " + END)
         while source_map not in setups:
-            source_map = raw_input(
+            source_map = input(
                 INPUT + PREFIX + "The source mapping was not defined. "
                 "Please provide the source mapping "
                 "(primary or secondary): " + END)
         while not os.path.isfile(var_file):
-            var_file = raw_input("%s%svar file mapping '%s' does not exist. "
-                                 "Please provide a valid mapping var file: %s"
-                                 % (INPUT,
-                                    PREFIX,
-                                    var_file,
-                                    END))
+            var_file = input("%s%svar file mapping '%s' does not exist. "
+                             "Please provide a valid mapping var file: %s"
+                             % (INPUT, PREFIX, var_file, END))
         while not os.path.isfile(vault):
-            vault = raw_input("%s%spassword file '%s' does not exist."
-                              " Please provide a valid password file:%s "
-                              % (INPUT,
-                                 PREFIX,
-                                 vault,
-                                 END))
+            vault = input("%s%spassword file '%s' does not exist."
+                          " Please provide a valid password file:%s "
+                          % (INPUT, PREFIX, vault, END))
         while (not ansible_play) or (not os.path.isfile(ansible_play)):
-            ansible_play = raw_input("%s%sansible play '%s' "
-                                     "is not initialized. "
-                                     "Please provide the ansible play file "
-                                     "to generate the mapping var file "
-                                     "with ('%s'):%s "
-                                     % (INPUT,
-                                        PREFIX,
-                                        str(ansible_play),
-                                        PLAY_DEF,
-                                        END) or PLAY_DEF)
+            ansible_play = input("%s%sansible play '%s' "
+                                 "is not initialized. "
+                                 "Please provide the ansible play file "
+                                 "to generate the mapping var file "
+                                 "with ('%s'):%s "
+                                 % (INPUT, PREFIX, str(ansible_play),
+                                    PLAY_DEF, END) or PLAY_DEF)
         return (target_host, source_map, var_file, vault, ansible_play)
 
     def _set_log(self, log_file, log_level):

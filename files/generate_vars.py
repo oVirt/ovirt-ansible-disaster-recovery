@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from six.moves import input
+
 from bcolors import bcolors
 
 from ConfigParser import SafeConfigParser
@@ -163,13 +165,10 @@ class GenerateMappingFile():
         if os.path.isfile(fname):
             valid = {"yes": True, "y": True, "ye": True,
                      "no": False, "n": False}
-            ans = raw_input("%s%sThe output file '%s' "
-                            "already exists. "
-                            "Would you like to override it (y,n)?%s "
-                            % (WARN,
-                               PREFIX,
-                               fname,
-                               END))
+            ans = input("%s%sThe output file '%s' "
+                        "already exists. "
+                        "Would you like to override it (y,n)?%s "
+                        % (WARN, PREFIX, fname, END))
             while True:
                 ans = ans.lower()
                 if ans in valid:
@@ -181,10 +180,8 @@ class GenerateMappingFile():
                         sys.exit(0)
                     break
                 else:
-                    ans = raw_input("%s%sPlease respond with 'yes' or 'no': %s"
-                                    % (INPUT,
-                                       PREFIX,
-                                       END))
+                    ans = input("%s%sPlease respond with 'yes' or 'no': %s"
+                                % (INPUT, PREFIX, END))
             try:
                 os.remove(fname)
             except OSError:
@@ -251,57 +248,38 @@ class GenerateMappingFile():
                                                        _SECTION,
                                                        ansible_play=None))
         if not site:
-            site = raw_input("%s%sSite address is not initialized. "
-                             "Please provide the site URL (%s):%s "
-                             % (INPUT,
-                                PREFIX,
-                                SITE_DEF,
-                                END)) or SITE_DEF
+            site = input("%s%sSite address is not initialized. "
+                         "Please provide the site URL (%s):%s "
+                         % (INPUT, PREFIX, SITE_DEF, END)) or SITE_DEF
         if not username:
-            username = raw_input("%s%sUsername is not initialized. "
-                                 "Please provide username "
-                                 "(%s):%s "
-                                 % (INPUT,
-                                    PREFIX,
-                                    USERNAME_DEF,
-                                    END)) or USERNAME_DEF
+            username = input("%s%sUsername is not initialized. "
+                             "Please provide username (%s):%s "
+                             % (INPUT, PREFIX, USERNAME_DEF, END)
+                             ) or USERNAME_DEF
         while not password:
-            password = raw_input("%s%sPassword is not initialized. "
-                                 "Please provide the password for "
-                                 "username %s:%s "
-                                 % (INPUT,
-                                    PREFIX,
-                                    username,
-                                    END))
+            password = input("%s%sPassword is not initialized. "
+                             "Please provide the password for "
+                             "username %s:%s "
+                             % (INPUT, PREFIX, username, END))
 
         while not ca_file:
-            ca_file = raw_input("%s%sCa file is not initialized. "
-                                "Please provide the ca file location "
-                                "(%s):%s "
-                                % (INPUT,
-                                   PREFIX,
-                                   CA_DEF,
-                                   END)) or CA_DEF
+            ca_file = input("%s%sCa file is not initialized. "
+                            "Please provide the ca file location (%s):%s "
+                            % (INPUT, PREFIX, CA_DEF, END)) or CA_DEF
 
         while not output_file:
-            output_file = raw_input("%s%sOutput file is not initialized. "
-                                    "Please provide the output file location "
-                                    "for the mapping var file (%s):%s "
-                                    % (INPUT,
-                                       PREFIX,
-                                       _OUTPUT_FILE,
-                                       END)) or _OUTPUT_FILE
+            output_file = input("%s%sOutput file is not initialized. "
+                                "Please provide the output file location "
+                                "for the mapping var file (%s):%s "
+                                % (INPUT, PREFIX, _OUTPUT_FILE, END)
+                                ) or _OUTPUT_FILE
         self._validate_output_file_exists(output_file, log)
         while not ansible_play or not os.path.isfile(ansible_play):
-            ansible_play = raw_input("%s%sAnsible play '%s' is not "
-                                     "initialized. Please provide the ansible "
-                                     "play to generate the mapping var file "
-                                     "(%s):%s "
-                                     % (INPUT,
-                                        PREFIX,
-                                        ansible_play,
-                                        PLAY_DEF,
-                                        END)) or PLAY_DEF
+            ansible_play = input("%s%sAnsible play '%s' is not "
+                                 "initialized. Please provide the ansible "
+                                 "play to generate the mapping var file (%s):%s "
+                                 % (INPUT, PREFIX, ansible_play, PLAY_DEF, END)
+                                 ) or PLAY_DEF
         return site, username, password, ca_file, output_file, ansible_play
 
 

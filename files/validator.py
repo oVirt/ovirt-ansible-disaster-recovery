@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from six.moves import input
+
 from bcolors import bcolors
 import collections
 from ConfigParser import SafeConfigParser
@@ -46,18 +48,18 @@ class ValidateMappingFile():
                  self.var_file,
                  END))
         while not os.path.isfile(self.var_file):
-            self.var_file = raw_input(
+            self.var_file = input(
                 "%s%sVar file '%s' does not exists. "
                 "Please provide the location of the var file:%s " %
                 (FAIL, PREFIX, self.var_file, END))
 
         python_vars = self._read_var_file()
-        self.primary_pwd = raw_input(
+        self.primary_pwd = input(
             "%s%sPlease provide password for the primary setup: %s" %
             (INPUT,
              PREFIX,
              END))
-        self.second_pwd = raw_input(
+        self.second_pwd = input(
             "%s%sPlease provide password for the secondary setup: %s" %
             (INPUT,
              PREFIX,
@@ -137,12 +139,12 @@ class ValidateMappingFile():
 
         # If no default location exists, get the location from the user.
         while not var_file:
-            var_file = raw_input("%s%sVar file is not initialized. "
-                                 "Please provide the location of the var file "
-                                 "(%s):%s " % (WARN,
-                                               PREFIX,
-                                               self.def_var_file,
-                                               END) or self.def_var_file)
+            var_file = input("%s%sVar file is not initialized. "
+                             "Please provide the location of the var file "
+                             "(%s):%s " % (WARN,
+                                           PREFIX,
+                                           self.def_var_file,
+                                           END) or self.def_var_file)
 
         self.var_file = var_file
 
@@ -213,7 +215,7 @@ class ValidateMappingFile():
                 info_dict = yaml.load(stream)
                 running_vms_file = info_dict.get(self.running_vms)
                 if os.path.isfile(running_vms_file):
-                    ans = raw_input(
+                    ans = input(
                         "%s%sFile with running vms info already exists from "
                         "previous failback operation. Do you want to "
                         "delete it(yes,no)?: %s" %

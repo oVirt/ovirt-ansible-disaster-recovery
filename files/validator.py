@@ -72,11 +72,11 @@ class ValidateMappingFile():
             self._print_finish_error()
             exit()
 
-        if (not self._validate_hosted_engine(python_vars)):
+        if not self._validate_hosted_engine(python_vars):
             self._print_finish_error()
             exit()
 
-        if (not self._validate_export_domain(python_vars)):
+        if not self._validate_export_domain(python_vars):
             self._print_finish_error()
             exit()
         self._print_finish_success()
@@ -369,7 +369,7 @@ class ValidateMappingFile():
             map_key = mapping[keys[0]] + \
                       "_" + mapping[keys[1]] + \
                       "_" + (mapping[keys[2]] if keys[2] in mapping else "")
-            if (map_key in dups):
+            if map_key in dups:
                 if keys[2] not in mapping:
                     print(
                         "%s%sVnic profile name '%s' and network name '%s'"
@@ -449,7 +449,7 @@ class ValidateMappingFile():
         for domain in domains:
             primary = domain['dr_primary_name']
             secondary = domain['dr_secondary_name']
-            if (primary == hosted or secondary == hosted):
+            if primary == hosted or secondary == hosted:
                 print("%s%sHosted storage domains are not supported.%s"
                       % (FAIL,
                          PREFIX,
@@ -507,7 +507,7 @@ class ValidateMappingFile():
                 vms_delete_protected.append(vm.name)
             snapshots_service = vm_service.snapshots_service()
             for snapshot in snapshots_service.list():
-                if (snapshot.snapshot_status == types.SnapshotStatus.IN_PREVIEW):
+                if snapshot.snapshot_status == types.SnapshotStatus.IN_PREVIEW:
                     vms_in_preview.append(vm.name)
         if len(vms_in_preview) > 0:
             print("%s%sFailback process does not support VMs in preview."
@@ -608,7 +608,7 @@ class ValidateMappingFile():
         key1_b = 'primary_network_name'
         key1_c = 'primary_network_dc'
         for x in _mapping:
-            if (x[key1_a] is None or x[key1_b] is None):
+            if x[key1_a] is None or x[key1_b] is None:
                 print("%s%sNetwork '%s' is not initialized in map %s %s%s"
                       % (FAIL,
                          PREFIX,
@@ -618,7 +618,7 @@ class ValidateMappingFile():
                          END))
                 exit()
             primary_dc_name = ''
-            if (key1_c in x):
+            if key1_c in x:
                 primary_dc_name = x[key1_c]
             map_key = x[key1_a] + "_" + x[key1_b] + "_" + primary_dc_name
             if map_key in _primary1:
@@ -632,7 +632,7 @@ class ValidateMappingFile():
         val1_b = 'secondary_network_name'
         val1_c = 'secondary_network_dc'
         for x in _mapping:
-            if (x[val1_a] is None or x[val1_b] is None):
+            if x[val1_a] is None or x[val1_b] is None:
                 print("%s%sThe following network mapping is not "
                       "initialized in var file mapping:\n"
                       "  %s:'%s'\n  %s:'%s'%s"
@@ -645,7 +645,7 @@ class ValidateMappingFile():
                          END))
                 exit()
             secondary_dc_name = ''
-            if (val1_c in x):
+            if val1_c in x:
                 secondary_dc_name = x[val1_c]
             map_key = x[val1_a] + "_" + x[val1_b] + "_" + secondary_dc_name
             if map_key in _second1:

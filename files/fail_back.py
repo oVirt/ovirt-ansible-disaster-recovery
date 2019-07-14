@@ -38,12 +38,12 @@ class FailBack():
                  "vault: %s \n"
                  "ansible_play: %s \n"
                  "report log: /tmp/%s \n"
-                 % (target_host,
+                 , target_host,
                      source_map,
                      var_file,
                      vault,
                      ansible_play,
-                     report))
+                     report)
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -83,21 +83,21 @@ class FailBack():
             "plain text please press ENTER): " + END)
         os.system("export vault_password=\"" + vault_pass + "\"")
         log.info("Starting cleanup process of setup %s"
-                 " for oVirt ansible disaster recovery" % target_host)
+                 " for oVirt ansible disaster recovery", target_host)
         print("\n%s%sStarting cleanup process of setup '%s'"
               " for oVirt ansible disaster recovery%s"
               % (INFO,
                   PREFIX,
                   target_host,
                   END))
-        log.info("Executing cleanup command: %s" % ' '.join(map(str, cmd)))
+        log.info("Executing cleanup command: %s", ' '.join(map(str, cmd)))
         if log_file is not None and log_file != '':
             self._log_to_file(log_file, cmd)
         else:
             self._log_to_console(cmd, log)
 
         log.info("Finished cleanup of setup %s"
-                 " for oVirt ansible disaster recovery" % source_map)
+                 " for oVirt ansible disaster recovery", source_map)
         print("\n%s%sFinished cleanup of setup '%s'"
               " for oVirt ansible disaster recovery%s"
               % (INFO,
@@ -105,7 +105,7 @@ class FailBack():
                   source_map,
                   END))
 
-        log.info("Start failback DR from setup '%s'" % target_host)
+        log.info("Start failback DR from setup '%s'", target_host)
         print("\n%s%sStarting fail-back process to setup '%s'"
               " from setup '%s' for oVirt ansible disaster recovery%s"
               % (INFO,
@@ -114,8 +114,8 @@ class FailBack():
                   source_map,
                   END))
 
-        log.info("Executing failback command: %s"
-                 % ' '.join(map(str, cmd_fb)))
+        log.info("Executing failback command: %s",
+                 ' '.join(map(str, cmd_fb)))
         if log_file is not None and log_file != '':
             self._log_to_file(log_file, cmd_fb)
         else:
@@ -250,7 +250,7 @@ class FailBack():
                                  "with ('%s'):%s "
                                  % (INPUT, PREFIX, str(ansible_play),
                                     PLAY_DEF, END) or PLAY_DEF)
-        return (target_host, source_map, var_file, vault, ansible_play)
+        return target_host, source_map, var_file, vault, ansible_play
 
     def _set_log(self, log_file, log_level):
         logger = logging.getLogger(PREFIX)

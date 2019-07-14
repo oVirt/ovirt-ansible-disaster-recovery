@@ -1,16 +1,14 @@
 #!/usr/bin/python
-from six.moves import input
-
-from bcolors import bcolors
-import collections
 from ConfigParser import SafeConfigParser
 import os.path
+
+from six.moves import input
 import ovirtsdk4 as sdk
 import ovirtsdk4.types as types
-import shlex
-from subprocess import call
-import sys
 import yaml
+
+from bcolors import bcolors
+
 
 INFO = bcolors.OKGREEN
 INPUT = bcolors.OKGREEN

@@ -94,7 +94,7 @@ class FailOver():
     def _handle_result(self, cmd):
         try:
             proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError as e:
             print("%sException: %s\n\n"
                   "failover operation failed, please check log file for "
                   "further details.%s"

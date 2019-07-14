@@ -60,7 +60,7 @@ def main(argv):
     elif action == '--help':
         help_log()
     else:
-        print "\tError: action '%s' is not defined" % action
+        print("\tError: action '%s' is not defined" % action)
         help_log()
 
 

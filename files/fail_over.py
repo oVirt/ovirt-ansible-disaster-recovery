@@ -37,12 +37,12 @@ class FailOver():
                  "vault: %s \n"
                  "ansible_play: %s \n"
                  "report file: /tmp/%s "
-                 % (target_host,
-                    source_map,
-                    var_file,
-                    vault,
-                    ansible_play,
-                    report))
+                 , target_host,
+                   source_map,
+                   var_file,
+                   vault,
+                   ansible_play,
+                   report)
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -63,7 +63,7 @@ class FailOver():
         vault_pass = input(
             INPUT + PREFIX + "Please enter the vault password: " + END)
         os.system("export vault_password=\"" + vault_pass + "\"")
-        log.info("Executing failover command: %s" % ' '.join(map(str, cmd)))
+        log.info("Executing failover command: %s", ' '.join(map(str, cmd)))
         if log_file is not None and log_file != '':
             self._log_to_file(log_file, cmd)
         else:
@@ -187,7 +187,7 @@ class FailOver():
                                  "with ('%s'):%s "
                                  % (INPUT, PREFIX, str(ansible_play),
                                     PLAY_DEF, END) or PLAY_DEF)
-        return (target_host, source_map, var_file, vault, ansible_play)
+        return target_host, source_map, var_file, vault, ansible_play
 
     def _set_log(self, log_file, log_level):
         logger = logging.getLogger(PREFIX)

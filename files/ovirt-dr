@@ -1,16 +1,16 @@
 #!/usr/bin/python
-from six.moves import input
-
 from ConfigParser import SafeConfigParser
-import fail_back
-import fail_over
-import errno
 import logging as logg
 import os
 import sys
 import time
-import generate_vars
 import getopt
+
+from six.moves import input
+
+import fail_back
+import fail_over
+import generate_vars
 import validator
 
 VALIDATE = 'validate'

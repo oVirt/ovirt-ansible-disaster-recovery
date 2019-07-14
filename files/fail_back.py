@@ -162,7 +162,7 @@ class FailBack():
         try:
             proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
             # do something with output
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError as e:
             print("%sException: %s\n\n"
                   "failback operation failed, please check log file for "
                   "further details.%s"

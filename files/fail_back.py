@@ -1,16 +1,16 @@
 #!/usr/bin/python
-from six.moves import input
-
-from bcolors import bcolors
 from ConfigParser import SafeConfigParser
 import logging
 import os.path
-import shlex
 import subprocess
+from subprocess import call
 import sys
 import time
 
-from subprocess import call
+from six.moves import input
+
+from bcolors import bcolors
+
 
 INFO = bcolors.OKGREEN
 INPUT = bcolors.OKGREEN

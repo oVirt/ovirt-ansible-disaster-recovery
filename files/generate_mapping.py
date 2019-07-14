@@ -1,9 +1,10 @@
 #!/usr/bin/python
-import ovirtsdk4 as sdk
-import ovirtsdk4.types as types
 import sys
 import getopt
 import logging
+
+import ovirtsdk4 as sdk
+import ovirtsdk4.types as types
 
 # TODO: log file location is currently in the same folder
 logging.basicConfig(level=logging.DEBUG, filename='generator.log')

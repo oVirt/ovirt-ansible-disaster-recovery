@@ -82,7 +82,8 @@ class FailOver():
         with open(log_file, "a") as f:
             proc = subprocess.Popen(cmd,
                                     stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+                                    stderr=subprocess.PIPE,
+                                    universal_newlines=True)
             for line in iter(proc.stdout.readline, ''):
                 if 'TASK [' in line:
                     print("\n%s%s%s\n" % (INFO,
@@ -111,7 +112,8 @@ class FailOver():
     def _log_to_console(self, cmd, log):
         proc = subprocess.Popen(cmd,
                                 stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+                                stderr=subprocess.PIPE,
+                                universal_newlines=True)
         for line in iter(proc.stdout.readline, ''):
             log.debug(line)
         for line in iter(proc.stderr.readline, ''):

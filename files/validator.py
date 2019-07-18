@@ -1,5 +1,8 @@
 #!/usr/bin/python
-from ConfigParser import SafeConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except ModuleNotFoundError:
+    from configparser import SafeConfigParser
 import os.path
 
 from six.moves import input

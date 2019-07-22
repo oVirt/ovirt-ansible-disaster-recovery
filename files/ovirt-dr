@@ -1,14 +1,19 @@
 #!/usr/bin/python
-from ConfigParser import SafeConfigParser
-import fail_back
-import fail_over
-import errno
+try:
+    from ConfigParser import SafeConfigParser
+except ModuleNotFoundError:
+    from configparser import SafeConfigParser
 import logging as logg
 import os
 import sys
 import time
-import generate_vars
 import getopt
+
+from six.moves import input
+
+import fail_back
+import fail_over
+import generate_vars
 import validator
 
 VALIDATE = 'validate'
@@ -25,7 +30,7 @@ DEF_CONF_FILE = 'dr.conf'
 def main(argv):
     action, conf_file, log_file, log_level = _init_vars(argv)
     while not os.path.isfile(conf_file):
-        conf_file = raw_input(
+        conf_file = input(
             "Conf file '" + conf_file + "' does not exist."
             " Please provide the configuration file location: ")
 
@@ -58,13 +63,14 @@ def main(argv):
     elif action == '--help':
         help_log()
     else:
-        print "\tError: action '%s' is not defined" % action
+        print("\tError: action '%s' is not defined" % action)
         help_log()
 
 
 def _print_log_file_name(log_file):
     if log_file is not None and log_file != '':
         print("Log file: '%s'" % log_file)
+
 
 def _init_vars(argv):
     conf_file = DEF_CONF_FILE
@@ -94,7 +100,7 @@ def _init_vars(argv):
             log_level = arg
 
     log_file, log_level = _get_log_conf(conf_file, log_file, log_level)
-    return (action, conf_file, log_file, log_level.upper())
+    return action, conf_file, log_file, log_level.upper()
 
 
 def _get_log_conf(conf_file, log_file, log_level):
@@ -102,7 +108,7 @@ def _get_log_conf(conf_file, log_file, log_level):
     log_file_conf = "log_file"
     log_level_conf = "log_level"
     while not os.path.isfile(conf_file):
-        conf_file = raw_input(
+        conf_file = input(
             "Conf file '" + conf_file + "' does not exist."
             " Please provide the configuration file location: ")
     settings = SafeConfigParser()
@@ -117,7 +123,7 @@ def _get_log_conf(conf_file, log_file, log_level):
         log_level = settings.get(log_section, log_level_conf)
     else:
         log_level = "DEBUG"
-    return (log_file, log_level)
+    return log_file, log_level
 
 
 def create_log_dir(fname):

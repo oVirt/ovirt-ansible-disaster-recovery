@@ -1,14 +1,19 @@
 #!/usr/bin/python
-from bcolors import bcolors
-from ConfigParser import SafeConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except ModuleNotFoundError:
+    from configparser import SafeConfigParser
 import logging
 import os.path
-import shlex
 import subprocess
+from subprocess import call
 import sys
 import time
 
-from subprocess import call
+from six.moves import input
+
+from bcolors import bcolors
+
 
 INFO = bcolors.OKGREEN
 INPUT = bcolors.OKGREEN
@@ -36,12 +41,12 @@ class FailBack():
                  "vault: %s \n"
                  "ansible_play: %s \n"
                  "report log: /tmp/%s \n"
-                 % (target_host,
+                 , target_host,
                      source_map,
                      var_file,
                      vault,
                      ansible_play,
-                     report))
+                     report)
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -76,26 +81,26 @@ class FailBack():
         cmd_fb.append("-vvv")
 
         # Setting vault password
-        vault_pass = raw_input(
+        vault_pass = input(
             INPUT + PREFIX + "Please enter vault password (In case of "
             "plain text please press ENTER): " + END)
         os.system("export vault_password=\"" + vault_pass + "\"")
         log.info("Starting cleanup process of setup %s"
-                 " for oVirt ansible disaster recovery" % target_host)
+                 " for oVirt ansible disaster recovery", target_host)
         print("\n%s%sStarting cleanup process of setup '%s'"
               " for oVirt ansible disaster recovery%s"
               % (INFO,
                   PREFIX,
                   target_host,
                   END))
-        log.info("Executing cleanup command: %s" % ' '.join(map(str, cmd)))
+        log.info("Executing cleanup command: %s", ' '.join(map(str, cmd)))
         if log_file is not None and log_file != '':
             self._log_to_file(log_file, cmd)
         else:
             self._log_to_console(cmd, log)
 
         log.info("Finished cleanup of setup %s"
-                 " for oVirt ansible disaster recovery" % source_map)
+                 " for oVirt ansible disaster recovery", source_map)
         print("\n%s%sFinished cleanup of setup '%s'"
               " for oVirt ansible disaster recovery%s"
               % (INFO,
@@ -103,7 +108,7 @@ class FailBack():
                   source_map,
                   END))
 
-        log.info("Start failback DR from setup '%s'" % target_host)
+        log.info("Start failback DR from setup '%s'", target_host)
         print("\n%s%sStarting fail-back process to setup '%s'"
               " from setup '%s' for oVirt ansible disaster recovery%s"
               % (INFO,
@@ -112,8 +117,8 @@ class FailBack():
                   source_map,
                   END))
 
-        log.info("Executing failback command: %s"
-                 % ' '.join(map(str, cmd_fb)))
+        log.info("Executing failback command: %s",
+                 ' '.join(map(str, cmd_fb)))
         if log_file is not None and log_file != '':
             self._log_to_file(log_file, cmd_fb)
         else:
@@ -130,7 +135,8 @@ class FailBack():
         with open(log_file, "a") as f:
             proc = subprocess.Popen(cmd,
                                     stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+                                    stderr=subprocess.PIPE,
+                                    universal_newlines=True)
             for line in iter(proc.stdout.readline, ''):
                 if 'TASK [' in line:
                     print("\n%s%s%s\n" % (INFO,
@@ -148,7 +154,8 @@ class FailBack():
     def _log_to_console(self, cmd, log):
         proc = subprocess.Popen(cmd,
                                 stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+                                stderr=subprocess.PIPE,
+                                universal_newlines=True)
         for line in iter(proc.stdout.readline, ''):
             if "[Failback Replication Sync]" in line:
                 print("%s%s%s" % (INFO, line, END))
@@ -162,7 +169,7 @@ class FailBack():
         try:
             proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
             # do something with output
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError as e:
             print("%sException: %s\n\n"
                   "failback operation failed, please check log file for "
                   "further details.%s"
@@ -223,41 +230,32 @@ class FailBack():
                                                        _SECTION,
                                                        ansible_play=None))
         while target_host not in setups:
-            target_host = raw_input(
+            target_host = input(
                 INPUT + PREFIX + "The target setup was not defined. "
                 "Please provide the setup which it is failback to "
                 "(primary or secondary): " + END)
         while source_map not in setups:
-            source_map = raw_input(
+            source_map = input(
                 INPUT + PREFIX + "The source mapping was not defined. "
                 "Please provide the source mapping "
                 "(primary or secondary): " + END)
         while not os.path.isfile(var_file):
-            var_file = raw_input("%s%svar file mapping '%s' does not exist. "
-                                 "Please provide a valid mapping var file: %s"
-                                 % (INPUT,
-                                    PREFIX,
-                                    var_file,
-                                    END))
+            var_file = input("%s%svar file mapping '%s' does not exist. "
+                             "Please provide a valid mapping var file: %s"
+                             % (INPUT, PREFIX, var_file, END))
         while not os.path.isfile(vault):
-            vault = raw_input("%s%spassword file '%s' does not exist."
-                              " Please provide a valid password file:%s "
-                              % (INPUT,
-                                 PREFIX,
-                                 vault,
-                                 END))
+            vault = input("%s%spassword file '%s' does not exist."
+                          " Please provide a valid password file:%s "
+                          % (INPUT, PREFIX, vault, END))
         while (not ansible_play) or (not os.path.isfile(ansible_play)):
-            ansible_play = raw_input("%s%sansible play '%s' "
-                                     "is not initialized. "
-                                     "Please provide the ansible play file "
-                                     "to generate the mapping var file "
-                                     "with ('%s'):%s "
-                                     % (INPUT,
-                                        PREFIX,
-                                        str(ansible_play),
-                                        PLAY_DEF,
-                                        END) or PLAY_DEF)
-        return (target_host, source_map, var_file, vault, ansible_play)
+            ansible_play = input("%s%sansible play '%s' "
+                                 "is not initialized. "
+                                 "Please provide the ansible play file "
+                                 "to generate the mapping var file "
+                                 "with ('%s'):%s "
+                                 % (INPUT, PREFIX, str(ansible_play),
+                                    PLAY_DEF, END) or PLAY_DEF)
+        return target_host, source_map, var_file, vault, ansible_play
 
     def _set_log(self, log_file, log_level):
         logger = logging.getLogger(PREFIX)

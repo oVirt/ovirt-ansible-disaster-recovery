@@ -1,14 +1,17 @@
 #!/usr/bin/python
-from bcolors import bcolors
-import collections
-from ConfigParser import SafeConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except ModuleNotFoundError:
+    from configparser import SafeConfigParser
 import os.path
+
+from six.moves import input
 import ovirtsdk4 as sdk
 import ovirtsdk4.types as types
-import shlex
-from subprocess import call
-import sys
 import yaml
+
+from bcolors import bcolors
+
 
 INFO = bcolors.OKGREEN
 INPUT = bcolors.OKGREEN
@@ -46,18 +49,18 @@ class ValidateMappingFile():
                  self.var_file,
                  END))
         while not os.path.isfile(self.var_file):
-            self.var_file = raw_input(
+            self.var_file = input(
                 "%s%sVar file '%s' does not exists. "
                 "Please provide the location of the var file:%s " %
                 (FAIL, PREFIX, self.var_file, END))
 
         python_vars = self._read_var_file()
-        self.primary_pwd = raw_input(
+        self.primary_pwd = input(
             "%s%sPlease provide password for the primary setup: %s" %
             (INPUT,
              PREFIX,
              END))
-        self.second_pwd = raw_input(
+        self.second_pwd = input(
             "%s%sPlease provide password for the secondary setup: %s" %
             (INPUT,
              PREFIX,
@@ -70,11 +73,11 @@ class ValidateMappingFile():
             self._print_finish_error()
             exit()
 
-        if (not self._validate_hosted_engine(python_vars)):
+        if not self._validate_hosted_engine(python_vars):
             self._print_finish_error()
             exit()
 
-        if (not self._validate_export_domain(python_vars)):
+        if not self._validate_export_domain(python_vars):
             self._print_finish_error()
             exit()
         self._print_finish_success()
@@ -137,12 +140,12 @@ class ValidateMappingFile():
 
         # If no default location exists, get the location from the user.
         while not var_file:
-            var_file = raw_input("%s%sVar file is not initialized. "
-                                 "Please provide the location of the var file "
-                                 "(%s):%s " % (WARN,
-                                               PREFIX,
-                                               self.def_var_file,
-                                               END) or self.def_var_file)
+            var_file = input("%s%sVar file is not initialized. "
+                             "Please provide the location of the var file "
+                             "(%s):%s " % (WARN,
+                                           PREFIX,
+                                           self.def_var_file,
+                                           END) or self.def_var_file)
 
         self.var_file = var_file
 
@@ -213,7 +216,7 @@ class ValidateMappingFile():
                 info_dict = yaml.load(stream)
                 running_vms_file = info_dict.get(self.running_vms)
                 if os.path.isfile(running_vms_file):
-                    ans = raw_input(
+                    ans = input(
                         "%s%sFile with running vms info already exists from "
                         "previous failback operation. Do you want to "
                         "delete it(yes,no)?: %s" %
@@ -367,7 +370,7 @@ class ValidateMappingFile():
             map_key = mapping[keys[0]] + \
                       "_" + mapping[keys[1]] + \
                       "_" + (mapping[keys[2]] if keys[2] in mapping else "")
-            if (map_key in dups):
+            if map_key in dups:
                 if keys[2] not in mapping:
                     print(
                         "%s%sVnic profile name '%s' and network name '%s'"
@@ -447,7 +450,7 @@ class ValidateMappingFile():
         for domain in domains:
             primary = domain['dr_primary_name']
             secondary = domain['dr_secondary_name']
-            if (primary == hosted or secondary == hosted):
+            if primary == hosted or secondary == hosted:
                 print("%s%sHosted storage domains are not supported.%s"
                       % (FAIL,
                          PREFIX,
@@ -505,7 +508,7 @@ class ValidateMappingFile():
                 vms_delete_protected.append(vm.name)
             snapshots_service = vm_service.snapshots_service()
             for snapshot in snapshots_service.list():
-                if (snapshot.snapshot_status == types.SnapshotStatus.IN_PREVIEW):
+                if snapshot.snapshot_status == types.SnapshotStatus.IN_PREVIEW:
                     vms_in_preview.append(vm.name)
         if len(vms_in_preview) > 0:
             print("%s%sFailback process does not support VMs in preview."
@@ -606,7 +609,7 @@ class ValidateMappingFile():
         key1_b = 'primary_network_name'
         key1_c = 'primary_network_dc'
         for x in _mapping:
-            if (x[key1_a] is None or x[key1_b] is None):
+            if x[key1_a] is None or x[key1_b] is None:
                 print("%s%sNetwork '%s' is not initialized in map %s %s%s"
                       % (FAIL,
                          PREFIX,
@@ -616,7 +619,7 @@ class ValidateMappingFile():
                          END))
                 exit()
             primary_dc_name = ''
-            if (key1_c in x):
+            if key1_c in x:
                 primary_dc_name = x[key1_c]
             map_key = x[key1_a] + "_" + x[key1_b] + "_" + primary_dc_name
             if map_key in _primary1:
@@ -630,7 +633,7 @@ class ValidateMappingFile():
         val1_b = 'secondary_network_name'
         val1_c = 'secondary_network_dc'
         for x in _mapping:
-            if (x[val1_a] is None or x[val1_b] is None):
+            if x[val1_a] is None or x[val1_b] is None:
                 print("%s%sThe following network mapping is not "
                       "initialized in var file mapping:\n"
                       "  %s:'%s'\n  %s:'%s'%s"
@@ -643,7 +646,7 @@ class ValidateMappingFile():
                          END))
                 exit()
             secondary_dc_name = ''
-            if (val1_c in x):
+            if val1_c in x:
                 secondary_dc_name = x[val1_c]
             map_key = x[val1_a] + "_" + x[val1_b] + "_" + secondary_dc_name
             if map_key in _second1:

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-VERSION="1.1.5"
-MILESTONE="master"
-RPM_RELEASE="1.1.$MILESTONE.$(date -u +%Y%m%d%H%M%S)"
+VERSION="1.2.0"
+MILESTONE=""
+RPM_RELEASE="1"
 
 ROLE_NAME="oVirt.disaster-recovery"
 PACKAGE_NAME="ovirt-ansible-disaster-recovery"

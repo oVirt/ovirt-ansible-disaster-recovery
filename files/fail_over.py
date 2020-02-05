@@ -1,13 +1,19 @@
 #!/usr/bin/python
-from bcolors import bcolors
-from ConfigParser import SafeConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except ModuleNotFoundError:
+    from configparser import SafeConfigParser
 import logging
 import os.path
 import subprocess
+from subprocess import call
 import sys
 import time
 
-from subprocess import call
+from six.moves import input
+
+from bcolors import bcolors
+
 
 INFO = bcolors.OKGREEN
 INPUT = bcolors.OKGREEN
@@ -34,12 +40,12 @@ class FailOver():
                  "vault: %s \n"
                  "ansible_play: %s \n"
                  "report file: /tmp/%s "
-                 % (target_host,
-                    source_map,
-                    var_file,
-                    vault,
-                    ansible_play,
-                    report))
+                 , target_host,
+                   source_map,
+                   var_file,
+                   vault,
+                   ansible_play,
+                   report)
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -62,10 +68,10 @@ class FailOver():
         cmd.append("--vault-password-file")
         cmd.append("vault_secret.sh")
         cmd.append("-vvv")
-        vault_pass = raw_input(
+        vault_pass = input(
             INPUT + PREFIX + "Please enter the vault password: " + END)
         os.system("export vault_password=\"" + vault_pass + "\"")
-        log.info("Executing failover command: %s" % ' '.join(map(str, cmd)))
+        log.info("Executing failover command: %s", ' '.join(map(str, cmd)))
         if log_file is not None and log_file != '':
             self._log_to_file(log_file, cmd)
         else:
@@ -81,7 +87,8 @@ class FailOver():
         with open(log_file, "a") as f:
             proc = subprocess.Popen(cmd,
                                     stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+                                    stderr=subprocess.PIPE,
+                                    universal_newlines=True)
             for line in iter(proc.stdout.readline, ''):
                 if 'TASK [' in line:
                     print("\n%s%s%s\n" % (INFO,
@@ -97,7 +104,7 @@ class FailOver():
 
     def _handle_result(self, cmd):
         try:
-            subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+            proc = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             print("%sException: %s\n\n"
                   "failover operation failed, please check log file for "
@@ -110,7 +117,8 @@ class FailOver():
     def _log_to_console(self, cmd, log):
         proc = subprocess.Popen(cmd,
                                 stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+                                stderr=subprocess.PIPE,
+                                universal_newlines=True)
         for line in iter(proc.stdout.readline, ''):
             log.debug(line)
         for line in iter(proc.stderr.readline, ''):
@@ -164,41 +172,32 @@ class FailOver():
                                                        _SECTION,
                                                        ansible_play=None))
         while target_host not in setups:
-            target_host = raw_input(
+            target_host = input(
                 INPUT + PREFIX + "target host was not defined. "
                 "Please provide the target host "
                 "(primary or secondary): " + END)
         while source_map not in setups:
-            source_map = raw_input(
+            source_map = input(
                 INPUT + PREFIX + "source mapping was not defined. "
                 "Please provide the source mapping "
                 "(primary or secondary): " + END)
         while not os.path.isfile(var_file):
-            var_file = raw_input("%s%svar file mapping '%s' does not exist. "
-                                 "Please provide a valid mapping var file: %s"
-                                 % (INPUT,
-                                    PREFIX,
-                                    var_file,
-                                    END))
+            var_file = input("%s%svar file mapping '%s' does not exist. "
+                             "Please provide a valid mapping var file: %s"
+                             % (INPUT, PREFIX, var_file, END))
         while not os.path.isfile(vault):
-            vault = raw_input("%s%spassword file '%s' does not exist. "
-                              "Please provide a valid password file:%s "
-                              % (INPUT,
-                                 PREFIX,
-                                 vault,
-                                 END))
+            vault = input("%s%spassword file '%s' does not exist. "
+                          "Please provide a valid password file:%s "
+                          % (INPUT, PREFIX, vault, END))
         while (not ansible_play) or (not os.path.isfile(ansible_play)):
-            ansible_play = raw_input("%s%sansible play '%s' "
-                                     "is not initialized. "
-                                     "Please provide the ansible play file "
-                                     "to generate the mapping var file "
-                                     "with ('%s'):%s "
-                                     % (INPUT,
-                                        PREFIX,
-                                        str(ansible_play),
-                                        PLAY_DEF,
-                                        END) or PLAY_DEF)
-        return (target_host, source_map, var_file, vault, ansible_play)
+            ansible_play = input("%s%sansible play '%s' "
+                                 "is not initialized. "
+                                 "Please provide the ansible play file "
+                                 "to generate the mapping var file "
+                                 "with ('%s'):%s "
+                                 % (INPUT, PREFIX, str(ansible_play),
+                                    PLAY_DEF, END) or PLAY_DEF)
+        return target_host, source_map, var_file, vault, ansible_play
 
     def _set_log(self, log_file, log_level):
         logger = logging.getLogger(PREFIX)

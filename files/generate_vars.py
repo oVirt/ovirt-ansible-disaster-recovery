@@ -1,12 +1,18 @@
 #!/usr/bin/python
-from bcolors import bcolors
+try:
+    from ConfigParser import SafeConfigParser
+except ModuleNotFoundError:
+    from configparser import SafeConfigParser
 
-from ConfigParser import SafeConfigParser
 import logging
 import os.path
-import ovirtsdk4 as sdk
 import subprocess
 import sys
+from six.moves import input
+
+import ovirtsdk4 as sdk
+
+from bcolors import bcolors
 
 
 INFO = bcolors.OKGREEN
@@ -37,11 +43,7 @@ class GenerateMappingFile():
                  "ca file location: %s \n"
                  "output file location: %s \n"
                  "ansible play location: %s "
-                 % (site,
-                    username,
-                    ca_file,
-                    var_file_path,
-                    _ansible_play))
+                 , site, username, ca_file, var_file_path, _ansible_play)
         if not self._validate_connection(log,
                                          site,
                                          username,
@@ -59,24 +61,25 @@ class GenerateMappingFile():
         cmd.append("-e")
         cmd.append(command)
         cmd.append("-vvvvv")
-        log.info("Executing command %s" % ' '.join(map(str, cmd)))
+        log.info("Executing command %s", ' '.join(map(str, cmd)))
         if log_file is not None and log_file != '':
             self._log_to_file(log_file, cmd)
         else:
             self._log_to_console(cmd, log)
 
         if not os.path.isfile(var_file_path):
-            log.error("Can not find output file in '%s'." % var_file_path)
+            log.error("Can not find output file in '%s'.", var_file_path)
             self._print_error(log)
             exit()
-        log.info("Var file location: '%s'" % var_file_path)
+        log.info("Var file location: '%s'", var_file_path)
         self._print_success(log)
 
     def _log_to_file(self, log_file, cmd):
         with open(log_file, "a") as f:
             proc = subprocess.Popen(cmd,
                                     stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+                                    stderr=subprocess.PIPE,
+                                    universal_newlines=True)
             for line in iter(proc.stdout.readline, ''):
                 f.write(line)
             for line in iter(proc.stderr.readline, ''):
@@ -88,7 +91,8 @@ class GenerateMappingFile():
     def _log_to_console(self, cmd, log):
         proc = subprocess.Popen(cmd,
                                 stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+                                stderr=subprocess.PIPE,
+                                universal_newlines=True)
         for line in iter(proc.stdout.readline, ''):
             log.debug(line)
         for line in iter(proc.stderr.readline, ''):
@@ -150,7 +154,7 @@ class GenerateMappingFile():
                   + "\n CA file: " + ca
             log.error(msg)
             print("%s%s%s%s" % (FAIL, PREFIX, msg, END))
-            log.error("Error: %s" % e)
+            log.error("Error: %s", e)
             if conn:
                 conn.close()
             return False
@@ -159,19 +163,16 @@ class GenerateMappingFile():
     def _validate_output_file_exists(self, fname, log):
         _dir = os.path.dirname(fname)
         if _dir != '' and not os.path.exists(_dir):
-            log.warn("Path '%s' does not exists. Create folder"
-                     % _dir)
+            log.warn("Path '%s' does not exists. Create folder",
+                     _dir)
             os.makedirs(_dir)
         if os.path.isfile(fname):
             valid = {"yes": True, "y": True, "ye": True,
                      "no": False, "n": False}
-            ans = raw_input("%s%sThe output file '%s' "
-                            "already exists. "
-                            "Would you like to override it (y,n)?%s "
-                            % (WARN,
-                               PREFIX,
-                               fname,
-                               END))
+            ans = input("%s%sThe output file '%s' "
+                        "already exists. "
+                        "Would you like to override it (y,n)?%s "
+                        % (WARN, PREFIX, fname, END))
             while True:
                 ans = ans.lower()
                 if ans in valid:
@@ -183,14 +184,12 @@ class GenerateMappingFile():
                         sys.exit(0)
                     break
                 else:
-                    ans = raw_input("%s%sPlease respond with 'yes' or 'no': %s"
-                                    % (INPUT,
-                                       PREFIX,
-                                       END))
+                    ans = input("%s%sPlease respond with 'yes' or 'no': %s"
+                                % (INPUT, PREFIX, END))
             try:
                 os.remove(fname)
             except OSError:
-                log.error("File %s could not be replaced." % fname)
+                log.error("File %s could not be replaced.", fname)
                 print("%s%sFile %s could not be replaced.%s"
                       % (FAIL,
                          PREFIX,
@@ -252,59 +251,40 @@ class GenerateMappingFile():
                                     vars=DefaultOption(settings,
                                                        _SECTION,
                                                        ansible_play=None))
-        if (not site):
-            site = raw_input("%s%sSite address is not initialized. "
-                             "Please provide the site URL (%s):%s "
-                             % (INPUT,
-                                PREFIX,
-                                SITE_DEF,
-                                END)) or SITE_DEF
-        if (not username):
-            username = raw_input("%s%sUsername is not initialized. "
-                                 "Please provide username "
-                                 "(%s):%s "
-                                 % (INPUT,
-                                    PREFIX,
-                                    USERNAME_DEF,
-                                    END)) or USERNAME_DEF
-        while (not password):
-            password = raw_input("%s%sPassword is not initialized. "
-                                 "Please provide the password for "
-                                 "username %s:%s "
-                                 % (INPUT,
-                                    PREFIX,
-                                    username,
-                                    END))
+        if not site:
+            site = input("%s%sSite address is not initialized. "
+                         "Please provide the site URL (%s):%s "
+                         % (INPUT, PREFIX, SITE_DEF, END)) or SITE_DEF
+        if not username:
+            username = input("%s%sUsername is not initialized. "
+                             "Please provide username (%s):%s "
+                             % (INPUT, PREFIX, USERNAME_DEF, END)
+                             ) or USERNAME_DEF
+        while not password:
+            password = input("%s%sPassword is not initialized. "
+                             "Please provide the password for "
+                             "username %s:%s "
+                             % (INPUT, PREFIX, username, END))
 
-        while (not ca_file):
-            ca_file = raw_input("%s%sCa file is not initialized. "
-                                "Please provide the ca file location "
-                                "(%s):%s "
-                                % (INPUT,
-                                   PREFIX,
-                                   CA_DEF,
-                                   END)) or CA_DEF
+        while not ca_file:
+            ca_file = input("%s%sCa file is not initialized. "
+                            "Please provide the ca file location (%s):%s "
+                            % (INPUT, PREFIX, CA_DEF, END)) or CA_DEF
 
-        while (not output_file):
-            output_file = raw_input("%s%sOutput file is not initialized. "
-                                    "Please provide the output file location "
-                                    "for the mapping var file (%s):%s "
-                                    % (INPUT,
-                                       PREFIX,
-                                       _OUTPUT_FILE,
-                                       END)) or _OUTPUT_FILE
+        while not output_file:
+            output_file = input("%s%sOutput file is not initialized. "
+                                "Please provide the output file location "
+                                "for the mapping var file (%s):%s "
+                                % (INPUT, PREFIX, _OUTPUT_FILE, END)
+                                ) or _OUTPUT_FILE
         self._validate_output_file_exists(output_file, log)
-        while (not ansible_play) or (not os.path.isfile(ansible_play)):
-            ansible_play = raw_input("%s%sAnsible play '%s' is not "
-                                     "initialized. Please provide the ansible "
-                                     "play to generate the mapping var file "
-                                     "(%s):%s "
-                                     % (INPUT,
-                                        PREFIX,
-                                        ansible_play,
-                                        PLAY_DEF,
-                                        END)) or PLAY_DEF
-        return (site, username, password, ca_file, output_file, ansible_play)
+        while not ansible_play or not os.path.isfile(ansible_play):
+            ansible_play = input("%s%sAnsible play '%s' is not "
+                                 "initialized. Please provide the ansible "
+                                 "play to generate the mapping var file (%s):%s "
+                                 % (INPUT, PREFIX, ansible_play, PLAY_DEF, END)
+                                 ) or PLAY_DEF
+        return site, username, password, ca_file, output_file, ansible_play
 
 
 class DefaultOption(dict):

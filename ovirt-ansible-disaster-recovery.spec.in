@@ -37,6 +37,9 @@ sh build.sh install
 %license LICENSE
 
 %changelog
+* Tue Jul 23 2019 Eyal Shenitzky <eshenitz@redhat.com> - 1.2.0-1
+- Convert python scripts to support both Python 2 and Python 3
+
 * Thu Jan 10 2019 Eyal Shenitzky <eshenitz@redhat.com> - 1.1.4-1
 - Rename all tasks module calls from plural to singular
 - Use ovirt_vm.py module from Ansible lib instead local lib ovirt_vms.py module

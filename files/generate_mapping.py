@@ -1,9 +1,10 @@
 #!/usr/bin/python
-import ovirtsdk4 as sdk
-import ovirtsdk4.types as types
 import sys
 import getopt
 import logging
+
+import ovirtsdk4 as sdk
+import ovirtsdk4.types as types
 
 # TODO: log file location is currently in the same folder
 logging.basicConfig(level=logging.DEBUG, filename='generator.log')
@@ -70,7 +71,7 @@ def _init_vars(argv):
             ca = arg
         elif opt in ("-f", "--file"):
             file_ = arg
-    return (url, username, password, ca, file_)
+    return url, username, password, ca, file_
 
 
 def _connect_sdk(url, username, password, ca, log_):
@@ -120,7 +121,7 @@ def _handle_dc_properties(f, connection):
         _add_clusters_and_aff_groups_for_dc(dc_service,
                                             clusters,
                                             affinity_groups)
-    return (clusters, affinity_groups)
+    return clusters, affinity_groups
 
 
 def _get_host_storages_for_external_lun_disks(connection):
@@ -285,7 +286,7 @@ def _add_secondary_mount(f, dc_name, attached):
     f.write("  dr_secondary_dc_name: # %s\n" % dc_name)
     f.write("  dr_secondary_path: # %s\n" % attached.storage.path)
     f.write("  dr_secondary_address: # %s\n" % attached.storage.address)
-    if (attached._storage.type == types.StorageType.POSIXFS):
+    if attached._storage.type == types.StorageType.POSIXFS:
         f.write("  dr_secondary_vfs_type: # %s\n"
                 % attached.storage.vfs_type)
 
@@ -412,7 +413,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
                            disk_storage.port,
                            portal,
                            disk_storage.target))
-                if (disk_storage.username is not None):
+                if disk_storage.username is not None:
                     f.write("  primary_logical_unit_username: %s\n"
                             "  primary_logical_unit_password: "
                             "PLEASE_SET_PASSWORD_HERE\n"
@@ -437,7 +438,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
                        disk_storage.port,
                        portal,
                        disk_storage.target))
-            if (disk_storage.username is not None):
+            if disk_storage.username is not None:
                 f.write("  secondary_logical_unit_username: # %s\n"
                         "  secondary_logical_unit_password:"
                         "PLEASE_SET_PASSWORD_HERE\n"

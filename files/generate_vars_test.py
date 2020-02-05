@@ -1,7 +1,6 @@
-import pexpect
 import os
-
 from contextlib import contextmanager
+import pexpect
 
 
 @contextmanager
@@ -25,10 +24,10 @@ INITIAL_CONF = """
 def test_initial_conf(tmpdir):
     conf = tmpdir.join("dr.conf")
     conf.write(INITIAL_CONF)
-    with generator(tmpdir) as g:
+    with generator(tmpdir) as gen:
         # TODO: Use regex
-        g.expect('override')
+        gen.expect('override')
         # Add dry run
-        g.sendline('y')
+        gen.sendline('y')
         # "/tmp/dr_ovirt-ansible/mapping_vars.yml"
         assert os.path.exists("/tmp/dr_ovirt-ansible/mapping_vars.yml")

@@ -505,7 +505,8 @@ class ValidateMappingFile():
                 vms_delete_protected.append(vm.name)
             snapshots_service = vm_service.snapshots_service()
             for snapshot in snapshots_service.list():
-                if (snapshot.snapshot_status == types.SnapshotStatus.IN_PREVIEW):
+                if (snapshot.snapshot_status
+                        == types.SnapshotStatus.IN_PREVIEW):
                     vms_in_preview.append(vm.name)
         if len(vms_in_preview) > 0:
             print("%s%sFailback process does not support VMs in preview."

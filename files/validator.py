@@ -66,10 +66,10 @@ class ValidateMappingFile():
              PREFIX,
              END))
 
-        if (not self._validate_lists_in_mapping_file(python_vars) or
-            not self._validate_duplicate_keys(python_vars) or not
-                self._entity_validator(python_vars) or not
-                self._validate_failback_leftovers()):
+        if (not self._validate_lists_in_mapping_file(python_vars)
+                or not self._validate_duplicate_keys(python_vars)
+                or not self._entity_validator(python_vars)
+                or not self._validate_failback_leftovers()):
             self._print_finish_error()
             exit()
 
@@ -394,11 +394,11 @@ class ValidateMappingFile():
         return True
 
     def _get_network_dups(self, networks_setup):
-        attributes = [attr['profile_name'] +
-                      "_" +
-                      attr['network_name'] +
-                      "_" +
-                      attr['network_dc'] for attr in networks_setup]
+        attributes = [attr['profile_name']
+                      + "_"
+                      + attr['network_name']
+                      + "_"
+                      + attr['network_dc'] for attr in networks_setup]
         dups = [x for n, x in enumerate(attributes) if x in attributes[:n]]
         return dups
 
@@ -547,8 +547,8 @@ class ValidateMappingFile():
             cluster_sec = service_sec.list(search=search_sec)[0]
             prime_ver = cluster_prime.version
             sec_ver = cluster_sec.version
-            if (prime_ver.major != sec_ver.major or
-                    prime_ver.minor != sec_ver.minor):
+            if (prime_ver.major != sec_ver.major
+                    or prime_ver.minor != sec_ver.minor):
                 print("%s%sClusters has incompatible versions. "
                       "primary setup ('%s' %s.%s) not equal to "
                       "secondary setup ('%s' %s.%s)%s"

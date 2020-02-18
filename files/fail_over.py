@@ -58,8 +58,8 @@ class FailOver():
         cmd.append("@" + vault)
         cmd.append("-e")
         cmd.append(
-            " dr_target_host=" + target_host + " dr_source_map=" + source_map +
-            " dr_report_file=" + report)
+            " dr_target_host=" + target_host + " dr_source_map=" + source_map
+            + " dr_report_file=" + report)
         cmd.append("--vault-password-file")
         cmd.append("vault_secret.sh")
         cmd.append("-vvv")

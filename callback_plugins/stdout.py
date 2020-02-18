@@ -1,3 +1,7 @@
+from datetime import datetime
+
+from ansible.plugins.callback import CallbackBase
+
 # Make coding more python3-ish, this is required for contributions to Ansible
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -12,9 +16,6 @@ DOCUMENTATION = '''
   description:
       - This callback output the log of ansible play tasks.
 '''
-from datetime import datetime
-
-from ansible.plugins.callback import CallbackBase
 
 
 class CallbackModule(CallbackBase):

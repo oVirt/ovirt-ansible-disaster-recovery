@@ -73,9 +73,9 @@ class FailBack():
         cmd_fb.append("-e")
         cmd_fb.append("@" + vault)
         cmd_fb.append("-e")
-        cmd_fb.append(" dr_target_host=" + target_host +
-                      " dr_source_map=" + source_map +
-                      " dr_report_file=" + report)
+        cmd_fb.append(" dr_target_host=" + target_host
+                      + " dr_source_map=" + source_map
+                      + " dr_report_file=" + report)
         cmd_fb.append("--vault-password-file")
         cmd_fb.append("vault_secret.sh")
         cmd_fb.append("-vvv")

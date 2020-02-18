@@ -184,18 +184,18 @@ class ValidateMappingFile():
                     second_conn, 'secondary', python_vars) and isValid
                 cluster_mapping = python_vars.get(self.cluster_map)
                 isValid = isValid and self._validate_vms_for_failback(
-                                          primary_conn,
-                                          "primary",
-                                          ovirt_setups)
+                    primary_conn,
+                    "primary",
+                    ovirt_setups)
                 isValid = isValid and self._validate_vms_for_failback(
-                                          second_conn,
-                                          "secondary",
-                                          ovirt_setups)
+                    second_conn,
+                    "secondary",
+                    ovirt_setups)
                 isValid = isValid and self._is_compatible_versions(
-                                          primary_conn,
-                                          second_conn,
-                                          ovirt_setups,
-                                          cluster_mapping)
+                    primary_conn,
+                    second_conn,
+                    ovirt_setups,
+                    cluster_mapping)
             finally:
                 # Close the connections
                 if primary_conn:

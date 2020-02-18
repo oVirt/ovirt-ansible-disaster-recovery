@@ -200,7 +200,6 @@
   tags:
       - fail_over
       - fail_back
-
   always:
      - name: Print operation summary
        include_tasks: tasks/recover/print_info.yml
@@ -208,6 +207,3 @@
        ovirt_auth:
            state: absent
            ovirt_auth: "{{ ovirt_auth }}"
-  tags:
-      - fail_over
-      - fail_back

@@ -365,8 +365,8 @@ class ValidateMappingFile():
         keys = self._key_setup(setup, self.network_map)
         for mapping in _mappings:
             map_key = mapping[keys[0]] + \
-                      "_" + mapping[keys[1]] + \
-                      "_" + (mapping[keys[2]] if keys[2] in mapping else "")
+                "_" + mapping[keys[1]] + \
+                "_" + (mapping[keys[2]] if keys[2] in mapping else "")
             if (map_key in dups):
                 if keys[2] not in mapping:
                     print(

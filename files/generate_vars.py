@@ -281,7 +281,8 @@ class GenerateMappingFile():
         while not ansible_play or not os.path.isfile(ansible_play):
             ansible_play = input("%s%sAnsible play '%s' is not "
                                  "initialized. Please provide the ansible "
-                                 "play to generate the mapping var file (%s):%s "
+                                 "play to generate the mapping var file "
+                                 "(%s):%s "
                                  % (INPUT, PREFIX, ansible_play, PLAY_DEF, END)
                                  ) or PLAY_DEF
         return site, username, password, ca_file, output_file, ansible_play

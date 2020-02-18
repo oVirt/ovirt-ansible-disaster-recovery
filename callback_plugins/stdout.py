@@ -2,7 +2,8 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-# not only visible to ansible-doc, it also 'declares' the options the plugin requires and how to configure them.
+# not only visible to ansible-doc, it also 'declares' the options the plugin
+# requires and how to configure them.
 DOCUMENTATION = '''
   callback: stdout
   callback_type: aggregate
@@ -29,7 +30,8 @@ class CallbackModule(CallbackBase):
 
     def __init__(self):
 
-        # make sure the expected objects are present, calling the base's __init__
+        # make sure the expected objects are present, calling the base's
+        # __init__
         super(CallbackModule, self).__init__()
 
     def runner_on_failed(self, host, res, ignore_errors=False):

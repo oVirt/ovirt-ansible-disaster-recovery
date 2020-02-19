@@ -42,8 +42,8 @@ class GenerateMappingFile():
                  "password: *******\n"
                  "ca file location: %s \n"
                  "output file location: %s \n"
-                 "ansible play location: %s "
-                 , site, username, ca_file, var_file_path, _ansible_play)
+                 "ansible play location: %s ",
+                 site, username, ca_file, var_file_path, _ansible_play)
         if not self._validate_connection(log,
                                          site,
                                          username,
@@ -281,7 +281,8 @@ class GenerateMappingFile():
         while not ansible_play or not os.path.isfile(ansible_play):
             ansible_play = input("%s%sAnsible play '%s' is not "
                                  "initialized. Please provide the ansible "
-                                 "play to generate the mapping var file (%s):%s "
+                                 "play to generate the mapping var file "
+                                 "(%s):%s "
                                  % (INPUT, PREFIX, ansible_play, PLAY_DEF, END)
                                  ) or PLAY_DEF
         return site, username, password, ca_file, output_file, ansible_play

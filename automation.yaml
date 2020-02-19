@@ -1,4 +1,4 @@
 distros:
   - el7
 release_branches:
-  master: [ "ovirt-master", "ovirt-4.3" ]
+  ovirt-ansible-disaster-recovery-1.2: "ovirt-4.3"

@@ -66,10 +66,10 @@ class ValidateMappingFile():
              PREFIX,
              END))
 
-        if (not self._validate_lists_in_mapping_file(python_vars) or
-            not self._validate_duplicate_keys(python_vars) or not
-                self._entity_validator(python_vars) or not
-                self._validate_failback_leftovers()):
+        if (not self._validate_lists_in_mapping_file(python_vars)
+                or not self._validate_duplicate_keys(python_vars)
+                or not self._entity_validator(python_vars)
+                or not self._validate_failback_leftovers()):
             self._print_finish_error()
             exit()
 
@@ -187,18 +187,18 @@ class ValidateMappingFile():
                     second_conn, 'secondary', python_vars) and isValid
                 cluster_mapping = python_vars.get(self.cluster_map)
                 isValid = isValid and self._validate_vms_for_failback(
-                                          primary_conn,
-                                          "primary",
-                                          ovirt_setups)
+                    primary_conn,
+                    "primary",
+                    ovirt_setups)
                 isValid = isValid and self._validate_vms_for_failback(
-                                          second_conn,
-                                          "secondary",
-                                          ovirt_setups)
+                    second_conn,
+                    "secondary",
+                    ovirt_setups)
                 isValid = isValid and self._is_compatible_versions(
-                                          primary_conn,
-                                          second_conn,
-                                          ovirt_setups,
-                                          cluster_mapping)
+                    primary_conn,
+                    second_conn,
+                    ovirt_setups,
+                    cluster_mapping)
             finally:
                 # Close the connections
                 if primary_conn:
@@ -368,8 +368,8 @@ class ValidateMappingFile():
         keys = self._key_setup(setup, self.network_map)
         for mapping in _mappings:
             map_key = mapping[keys[0]] + \
-                      "_" + mapping[keys[1]] + \
-                      "_" + (mapping[keys[2]] if keys[2] in mapping else "")
+                "_" + mapping[keys[1]] + \
+                "_" + (mapping[keys[2]] if keys[2] in mapping else "")
             if map_key in dups:
                 if keys[2] not in mapping:
                     print(
@@ -394,11 +394,11 @@ class ValidateMappingFile():
         return True
 
     def _get_network_dups(self, networks_setup):
-        attributes = [attr['profile_name'] +
-                      "_" +
-                      attr['network_name'] +
-                      "_" +
-                      attr['network_dc'] for attr in networks_setup]
+        attributes = [attr['profile_name']
+                      + "_"
+                      + attr['network_name']
+                      + "_"
+                      + attr['network_dc'] for attr in networks_setup]
         dups = [x for n, x in enumerate(attributes) if x in attributes[:n]]
         return dups
 
@@ -514,21 +514,21 @@ class ValidateMappingFile():
             print("%s%sFailback process does not support VMs in preview."
                   " The '%s' setup contains the following previewed vms:"
                   " '%s'%s"
-                      % (FAIL,
-                         PREFIX,
-                         setup_type,
-                         vms_in_preview,
-                         END))
+                  % (FAIL,
+                     PREFIX,
+                     setup_type,
+                     vms_in_preview,
+                     END))
             return False
         if len(vms_delete_protected) > 0:
             print("%s%sFailback process does not support delete protected"
                   " VMs. The '%s' setup contains the following vms:"
                   " '%s'%s"
-                      % (FAIL,
-                         PREFIX,
-                         setup_type,
-                         vms_delete_protected,
-                         END))
+                  % (FAIL,
+                     PREFIX,
+                     setup_type,
+                     vms_delete_protected,
+                     END))
             return False
         return True
 
@@ -547,8 +547,8 @@ class ValidateMappingFile():
             cluster_sec = service_sec.list(search=search_sec)[0]
             prime_ver = cluster_prime.version
             sec_ver = cluster_sec.version
-            if (prime_ver.major != sec_ver.major or
-                    prime_ver.minor != sec_ver.minor):
+            if (prime_ver.major != sec_ver.major
+                    or prime_ver.minor != sec_ver.minor):
                 print("%s%sClusters has incompatible versions. "
                       "primary setup ('%s' %s.%s) not equal to "
                       "secondary setup ('%s' %s.%s)%s"

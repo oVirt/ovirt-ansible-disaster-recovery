@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 try:
     from ConfigParser import SafeConfigParser
 except ModuleNotFoundError:
@@ -40,13 +40,13 @@ class FailBack():
                  "var_file: %s \n"
                  "vault: %s \n"
                  "ansible_play: %s \n"
-                 "report log: /tmp/%s \n"
-                 , target_host,
-                     source_map,
-                     var_file,
-                     vault,
-                     ansible_play,
-                     report)
+                 "report log: /tmp/%s \n",
+                 target_host,
+                 source_map,
+                 var_file,
+                 vault,
+                 ansible_play,
+                 report)
 
         cmd = []
         cmd.append("ansible-playbook")
@@ -73,9 +73,9 @@ class FailBack():
         cmd_fb.append("-e")
         cmd_fb.append("@" + vault)
         cmd_fb.append("-e")
-        cmd_fb.append(" dr_target_host=" + target_host +
-                      " dr_source_map=" + source_map +
-                      " dr_report_file=" + report)
+        cmd_fb.append(" dr_target_host=" + target_host
+                      + " dr_source_map=" + source_map
+                      + " dr_report_file=" + report)
         cmd_fb.append("--vault-password-file")
         cmd_fb.append("vault_secret.sh")
         cmd_fb.append("-vvv")

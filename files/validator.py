@@ -368,8 +368,8 @@ class ValidateMappingFile():
         keys = self._key_setup(setup, self.network_map)
         for mapping in _mappings:
             map_key = mapping[keys[0]] + \
-                      "_" + mapping[keys[1]] + \
-                      "_" + (mapping[keys[2]] if keys[2] in mapping else "")
+                "_" + mapping[keys[1]] + \
+                "_" + (mapping[keys[2]] if keys[2] in mapping else "")
             if map_key in dups:
                 if keys[2] not in mapping:
                     print(
@@ -514,21 +514,21 @@ class ValidateMappingFile():
             print("%s%sFailback process does not support VMs in preview."
                   " The '%s' setup contains the following previewed vms:"
                   " '%s'%s"
-                      % (FAIL,
-                         PREFIX,
-                         setup_type,
-                         vms_in_preview,
-                         END))
+                  % (FAIL,
+                     PREFIX,
+                     setup_type,
+                     vms_in_preview,
+                     END))
             return False
         if len(vms_delete_protected) > 0:
             print("%s%sFailback process does not support delete protected"
                   " VMs. The '%s' setup contains the following vms:"
                   " '%s'%s"
-                      % (FAIL,
-                         PREFIX,
-                         setup_type,
-                         vms_delete_protected,
-                         END))
+                  % (FAIL,
+                     PREFIX,
+                     setup_type,
+                     vms_delete_protected,
+                     END))
             return False
         return True
 

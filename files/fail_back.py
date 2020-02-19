@@ -36,17 +36,17 @@ class FailBack():
             self._init_vars(conf_file)
         report = report_name.format(int(round(time.time() * 1000)))
         log.info("\ntarget_host: %s \n"
-                 "source_map: %s \n"
-                 "var_file: %s \n"
-                 "vault: %s \n"
-                 "ansible_play: %s \n"
-                 "report log: /tmp/%s \n"
-                 , target_host,
-                     source_map,
-                     var_file,
-                     vault,
-                     ansible_play,
-                     report)
+                "source_map: %s \n"
+                "var_file: %s \n"
+                "vault: %s \n"
+                "ansible_play: %s \n"
+                "report log: /tmp/%s \n",
+                target_host,
+                source_map,
+                var_file,
+                vault,
+                ansible_play,
+                report)
 
         cmd = []
         cmd.append("ansible-playbook")

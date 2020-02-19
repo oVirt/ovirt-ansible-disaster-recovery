@@ -42,8 +42,8 @@ class GenerateMappingFile():
                  "password: *******\n"
                  "ca file location: %s \n"
                  "output file location: %s \n"
-                 "ansible play location: %s "
-                 , site, username, ca_file, var_file_path, _ansible_play)
+                 "ansible play location: %s ",
+                 site, username, ca_file, var_file_path, _ansible_play)
         if not self._validate_connection(log,
                                          site,
                                          username,

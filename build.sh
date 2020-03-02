@@ -1,8 +1,22 @@
 #!/bin/bash
 
 VERSION="1.3.0"
-MILESTONE="master"
-RPM_RELEASE="0.1.$MILESTONE.$(date -u +%Y%m%d%H%M%S)"
+
+# Is this a release - build from tag?
+if git describe --tags |cut -f2- -d\-| grep -q '-'; then
+    # This is a master build, we want to make every build
+    # newer than all the previous builds using a timestamp,
+    # and make it easy to locate the commit from the build
+    # with the git commit hash.
+    MILESTONE="master"
+    RPM_RELEASE="0.1.$MILESTONE.$(date -u +%Y%m%d%H%M%S)"
+else
+    # This is a build from a tagged release, we don't need suffixes.
+    MILESTONE=""
+    RPM_RELEASE="1"
+fi
+
+
 
 ROLE_NAME="oVirt.disaster-recovery"
 PACKAGE_NAME="ovirt-ansible-disaster-recovery"

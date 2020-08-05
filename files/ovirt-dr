@@ -1,14 +1,11 @@
 #!/usr/bin/python3
-try:
-    from ConfigParser import SafeConfigParser
-except ModuleNotFoundError:
-    from configparser import SafeConfigParser
 import logging as logg
 import os
 import sys
 import time
 import getopt
 
+from configparser import ConfigParser
 from six.moves import input
 
 import fail_back
@@ -111,7 +108,7 @@ def _get_log_conf(conf_file, log_file, log_level):
         conf_file = input(
             "Conf file '" + conf_file + "' does not exist."
             " Please provide the configuration file location: ")
-    settings = SafeConfigParser()
+    settings = ConfigParser()
     settings.read(conf_file)
     if log_section not in settings.sections():
         settings.add_section(log_section)

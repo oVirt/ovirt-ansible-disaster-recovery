@@ -1,11 +1,8 @@
 #!/usr/bin/python3
-try:
-    from ConfigParser import SafeConfigParser
-except ModuleNotFoundError:
-    from configparser import SafeConfigParser
-import os.path
 
+from configparser import ConfigParser
 from six.moves import input
+
 import ovirtsdk4 as sdk
 import ovirtsdk4.types as types
 import yaml
@@ -127,7 +124,7 @@ class ValidateMappingFile():
         _VAR_FILE = 'var_file'
 
         # Get default location of the yml var file.
-        settings = SafeConfigParser()
+        settings = ConfigParser()
         settings.read(conf_file)
         if _SECTION not in settings.sections():
             settings.add_section(_SECTION)

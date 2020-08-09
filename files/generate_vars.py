@@ -1,13 +1,10 @@
 #!/usr/bin/python3
-try:
-    from ConfigParser import SafeConfigParser
-except ModuleNotFoundError:
-    from configparser import SafeConfigParser
-
 import logging
 import os.path
 import subprocess
 import sys
+
+from configparser import ConfigParser
 from six.moves import input
 
 import ovirtsdk4 as sdk
@@ -211,7 +208,7 @@ class GenerateMappingFile():
         """ Declare varialbles """
         site, username, password, ca_file, output_file, ansible_play = '', \
             '', '', '', '', ''
-        settings = SafeConfigParser()
+        settings = ConfigParser()
         settings.read(conf_file)
         if _SECTION not in settings.sections():
             settings.add_section(_SECTION)

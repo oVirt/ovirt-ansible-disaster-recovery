@@ -1,8 +1,4 @@
 #!/usr/bin/python3
-try:
-    from ConfigParser import SafeConfigParser
-except ModuleNotFoundError:
-    from configparser import SafeConfigParser
 import logging
 import os.path
 import subprocess
@@ -10,6 +6,7 @@ from subprocess import call
 import sys
 import time
 
+from configparser import ConfigParser
 from six.moves import input
 
 from bcolors import bcolors
@@ -132,7 +129,7 @@ class FailOver():
         """ Declare varialbles """
         target_host, source_map, vault, var_file, ansible_play = \
             '', '', '', '', ''
-        settings = SafeConfigParser()
+        settings = ConfigParser()
         settings.read(conf_file)
         if _SECTION not in settings.sections():
             settings.add_section(_SECTION)

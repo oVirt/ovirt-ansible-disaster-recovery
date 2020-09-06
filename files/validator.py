@@ -102,7 +102,7 @@ class ValidateMappingFile:
 
     def _read_var_file(self):
         with open(self.var_file, 'r') as info:
-            info_dict = yaml.load(info)
+            info_dict = yaml.safe_load(info)
         return info_dict
 
     def _set_dr_conf_variables(self, conf_file):
@@ -187,7 +187,7 @@ class ValidateMappingFile:
                  "no": False, "n": False}
         with open(self.default_main_file, 'r') as stream:
             try:
-                info_dict = yaml.load(stream)
+                info_dict = yaml.safe_load(stream)
                 running_vms_file = info_dict.get(self.running_vms)
                 if os.path.isfile(running_vms_file):
                     ans = input(

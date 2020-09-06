@@ -1,13 +1,13 @@
 #!/usr/bin/python3
-
-from configparser import ConfigParser
-from six.moves import input
+import os
+import yaml
 
 import ovirtsdk4 as sdk
 import ovirtsdk4.types as types
-import yaml
 
 from bcolors import bcolors
+from configparser import ConfigParser
+from six.moves import input
 
 
 INFO = bcolors.OKGREEN
@@ -18,10 +18,9 @@ END = bcolors.ENDC
 PREFIX = "[Validate Mapping File] "
 
 
-class ValidateMappingFile():
+class ValidateMappingFile:
 
-    def_var_file = "/var/lib/ovirt-ansible-disaster-" \
-                   "recovery/mapping_vars.yml"
+    def_var_file = "/var/lib/ovirt-ansible-disaster-recovery/mapping_vars.yml"
     default_main_file = "../defaults/main.yml"
     var_file = ""
     vault = ""
@@ -36,15 +35,10 @@ class ValidateMappingFile():
     def run(self, conf_file):
         print("%s%sValidate variable mapping file "
               "for oVirt ansible disaster recovery%s"
-              % (INFO,
-                 PREFIX,
-                 END))
+              % (INFO, PREFIX, END))
         self._set_dr_conf_variables(conf_file)
         print("%s%sVar File: '%s'%s"
-              % (INFO,
-                 PREFIX,
-                 self.var_file,
-                 END))
+              % (INFO, PREFIX, self.var_file, END))
         while not os.path.isfile(self.var_file):
             self.var_file = input(
                 "%s%sVar file '%s' does not exists. "
@@ -54,14 +48,10 @@ class ValidateMappingFile():
         python_vars = self._read_var_file()
         self.primary_pwd = input(
             "%s%sPlease provide password for the primary setup: %s" %
-            (INPUT,
-             PREFIX,
-             END))
+            (INPUT, PREFIX, END))
         self.second_pwd = input(
             "%s%sPlease provide password for the secondary setup: %s" %
-            (INPUT,
-             PREFIX,
-             END))
+            (INPUT, PREFIX, END))
 
         if (not self._validate_lists_in_mapping_file(python_vars)
                 or not self._validate_duplicate_keys(python_vars)
@@ -103,16 +93,12 @@ class ValidateMappingFile():
     def _print_finish_error(self):
         print("%s%sFailed to validate variable mapping file "
               "for oVirt ansible disaster recovery%s"
-              % (FAIL,
-                 PREFIX,
-                 END))
+              % (FAIL, PREFIX, END))
 
     def _print_finish_success(self):
         print("%s%sFinished validation of variable mapping file "
               "for oVirt ansible disaster recovery%s"
-              % (INFO,
-                 PREFIX,
-                 END))
+              % (INFO, PREFIX, END))
 
     def _read_var_file(self):
         with open(self.var_file, 'r') as info:
@@ -150,14 +136,8 @@ class ValidateMappingFile():
         ret_val = False
         for key in keys:
             if len(duplicates[key]) > 0:
-                print(
-                    "%s%sFound the following duplicate keys "
-                    "in %s: %s%s" %
-                    (FAIL,
-                     PREFIX,
-                     key,
-                     list(duplicates[key]),
-                     END))
+                print("%s%sFound the following duplicate keys in %s: %s%s" %
+                      (FAIL, PREFIX, key, list(duplicates[key]), END))
                 ret_val = True
         return ret_val
 
@@ -170,8 +150,8 @@ class ValidateMappingFile():
         isValid = ovirt_setups.validate_primary() and isValid
         isValid = ovirt_setups.validate_secondary() and isValid
         if isValid:
+            primary_conn, second_conn = '', ''
             try:
-                primary_conn, second_conn = '', ''
                 primary_conn = ovirt_setups.connect_primary()
                 if primary_conn is None:
                     return False
@@ -185,16 +165,13 @@ class ValidateMappingFile():
                 cluster_mapping = python_vars.get(self.cluster_map)
                 isValid = isValid and self._validate_vms_for_failback(
                     primary_conn,
-                    "primary",
-                    ovirt_setups)
+                    "primary")
                 isValid = isValid and self._validate_vms_for_failback(
                     second_conn,
-                    "secondary",
-                    ovirt_setups)
+                    "secondary")
                 isValid = isValid and self._is_compatible_versions(
                     primary_conn,
                     second_conn,
-                    ovirt_setups,
                     cluster_mapping)
             finally:
                 # Close the connections
@@ -217,41 +194,26 @@ class ValidateMappingFile():
                         "%s%sFile with running vms info already exists from "
                         "previous failback operation. Do you want to "
                         "delete it(yes,no)?: %s" %
-                        (WARN,
-                         PREFIX,
-                         END))
+                        (WARN, PREFIX, END))
                     ans = ans.lower()
                     if ans in valid and valid[ans]:
                         os.remove(running_vms_file)
-                        print("%s%sFile '%s' has been deleted"
-                              " successfully%s" %
-                              (INFO,
-                               PREFIX,
-                               running_vms_file,
-                               END))
+                        print("%s%sFile '%s' has been deleted successfully%s" %
+                              (INFO, PREFIX, running_vms_file, END))
                     else:
                         print("%s%sFile '%s' has not been deleted."
                               " It will be used in the next failback"
                               " operation%s" %
-                              (INFO,
-                               PREFIX,
-                               running_vms_file,
-                               END))
+                              (INFO, PREFIX, running_vms_file, END))
 
             except yaml.YAMLError as exc:
                 print("%s%syaml file '%s' could not be loaded%s"
-                      % (FAIL,
-                         PREFIX,
-                         self.default_main_file,
-                         END))
+                      % (FAIL, PREFIX, self.default_main_file, END))
                 print(exc)
                 return False
             except OSError as ex:
                 print("%s%sFail to validate failback running vms file '%s'%s"
-                      % (FAIL,
-                         PREFIX,
-                         self.default_main_file,
-                         END))
+                      % (FAIL, PREFIX, self.default_main_file, END))
                 print(ex)
                 return False
         return True
@@ -307,8 +269,7 @@ class ValidateMappingFile():
         affinity_labels = set()
         affinity_labels_service = \
             conn.system_service().affinity_labels_service()
-        affinity_labels_list = affinity_labels_service.list()
-        for affinity_label in affinity_labels_list:
+        for affinity_label in affinity_labels_service.list():
             affinity_labels.add(affinity_label.name)
         return list(affinity_labels)
 
@@ -336,6 +297,7 @@ class ValidateMappingFile():
                         get()._name
                     break
             mapped_network['network_name'] = network_name
+            # TODO: 'dc_name' might be referenced before assignment.
             mapped_network['network_dc'] = dc_name
             mapped_network['profile_name'] = vnic_profile_item.name
             networks.append(mapped_network)
@@ -384,10 +346,7 @@ class ValidateMappingFile():
                 # TODO: Add check whether the data center exists in the setup
         print("%s%sFinished validation for 'dr_network_mappings' for "
               "%s setup with success.%s" %
-              (INFO,
-               PREFIX,
-               setup,
-               END))
+              (INFO, PREFIX, setup, END))
         return True
 
     def _get_network_dups(self, networks_setup):
@@ -449,9 +408,7 @@ class ValidateMappingFile():
             secondary = domain['dr_secondary_name']
             if primary == hosted or secondary == hosted:
                 print("%s%sHosted storage domains are not supported.%s"
-                      % (FAIL,
-                         PREFIX,
-                         END))
+                      % (FAIL, PREFIX, END))
                 return False
         return True
 
@@ -461,9 +418,7 @@ class ValidateMappingFile():
             domain_type = domain['dr_storage_domain_type']
             if domain_type == 'export':
                 print("%s%sExport storage domain is not supported.%s"
-                      % (FAIL,
-                         PREFIX,
-                         END))
+                      % (FAIL, PREFIX, END))
                 return False
         return True
 
@@ -492,10 +447,7 @@ class ValidateMappingFile():
                          aff_label, network])) and isValid
         return isValid
 
-    def _validate_vms_for_failback(self,
-                                   setup_conn,
-                                   setup_type,
-                                   var_file):
+    def _validate_vms_for_failback(self, setup_conn, setup_type):
         vms_in_preview = []
         vms_delete_protected = []
         service_setup = setup_conn.system_service().vms_service()
@@ -532,7 +484,6 @@ class ValidateMappingFile():
     def _is_compatible_versions(self,
                                 primary_conn,
                                 second_conn,
-                                var_file,
                                 cluster_mapping):
         """ Validate cluster versions """
         service_primary = primary_conn.system_service().clusters_service()
@@ -546,7 +497,7 @@ class ValidateMappingFile():
             sec_ver = cluster_sec.version
             if (prime_ver.major != sec_ver.major
                     or prime_ver.minor != sec_ver.minor):
-                print("%s%sClusters has incompatible versions. "
+                print("%s%sClusters have incompatible versions. "
                       "primary setup ('%s' %s.%s) not equal to "
                       "secondary setup ('%s' %s.%s)%s"
                       % (FAIL,
@@ -568,10 +519,7 @@ class ValidateMappingFile():
             _mapping = var_file.get(mapping[1])
             if _mapping is None or len(_mapping) < 1:
                 print("%s%smapping %s is empty in var file%s"
-                      % (WARN,
-                         PREFIX,
-                         mapping[1],
-                         END))
+                      % (WARN, PREFIX, mapping[1], END))
                 duplicates[mapping[0]] = _return_set
                 continue
             _primary = set()
@@ -595,9 +543,7 @@ class ValidateMappingFile():
         _mapping = var_file.get(self.network_map)
         if _mapping is None or len(_mapping) < 1:
             print("%s%sNetwork has not been initialized in var file%s"
-                  % (WARN,
-                     PREFIX,
-                     END))
+                  % (WARN, PREFIX, END))
             return _return_set
 
         # Check for profile + network name duplicates in primary
@@ -756,25 +702,18 @@ class ConnectSDK:
             isValid = False
         return isValid
 
-    def _validate_connection(self,
-                             url,
-                             username,
-                             password,
-                             ca):
+    def _validate_connection(self, url, username, password, ca):
         conn = None
         try:
-            conn = self._connect_sdk(url,
-                                     username,
-                                     password,
-                                     ca)
+            conn = self._connect_sdk(url, username, password, ca)
             dcs_service = conn.system_service().data_centers_service()
             dcs_service.list()
         except Exception:
             print(
                 "%s%sConnection to setup has failed."
-                " Please check your cradentials: "
+                " Please check your credentials: "
                 "\n%s URL: %s"
-                "\n%s USER: %s"
+                "\n%s user: %s"
                 "\n%s CA file: %s%s" %
                 (FAIL,
                  PREFIX,

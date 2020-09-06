@@ -25,14 +25,14 @@ VAR_DEF = "/var/lib/ovirt-ansible-disaster-recovery/mapping_vars.yml"
 PLAY_DEF = "../examples/dr_play.yml"
 
 
-class GenerateMappingFile():
+class GenerateMappingFile:
 
     def run(self, conf_file, log_file, log_level):
         log = self._set_log(log_file, log_level)
         log.info("Start generate variable mapping file "
                  "for oVirt ansible disaster recovery")
         dr_tag = "generate_mapping"
-        site, username, password, ca_file, var_file_path, _ansible_play = \
+        site, username, password, ca_file, var_file_path, ansible_play = \
             self._init_vars(conf_file, log)
         log.info("Site address: %s \n"
                  "username: %s \n"
@@ -40,7 +40,7 @@ class GenerateMappingFile():
                  "ca file location: %s \n"
                  "output file location: %s \n"
                  "ansible play location: %s ",
-                 site, username, ca_file, var_file_path, _ansible_play)
+                 site, username, ca_file, var_file_path, ansible_play)
         if not self._validate_connection(log,
                                          site,
                                          username,
@@ -48,21 +48,19 @@ class GenerateMappingFile():
                                          ca_file):
             self._print_error(log)
             exit()
-        command = "site=" + site + " username=" + username + " password=" + \
-            password + " ca=" + ca_file + " var_file=" + var_file_path
-        cmd = []
-        cmd.append("ansible-playbook")
-        cmd.append(_ansible_play)
-        cmd.append("-t")
-        cmd.append(dr_tag)
-        cmd.append("-e")
-        cmd.append(command)
-        cmd.append("-vvvvv")
-        log.info("Executing command %s", ' '.join(map(str, cmd)))
+        extra_vars = "site={} username={} password={} ca={} var_file={}".\
+            format(site, username, password, ca_file, var_file_path)
+        command = [
+            "ansible-playbook", ansible_play,
+            "-t", dr_tag,
+            "-e", extra_vars,
+            "-vvvvv"
+        ]
+        log.info("Executing command %s", ' '.join(map(str, command)))
         if log_file is not None and log_file != '':
-            self._log_to_file(log_file, cmd)
+            self._log_to_file(log_file, command)
         else:
-            self._log_to_console(cmd, log)
+            self._log_to_console(command, log)
 
         if not os.path.isfile(var_file_path):
             log.error("Can not find output file in '%s'.", var_file_path)
@@ -71,9 +69,9 @@ class GenerateMappingFile():
         log.info("Var file location: '%s'", var_file_path)
         self._print_success(log)
 
-    def _log_to_file(self, log_file, cmd):
+    def _log_to_file(self, log_file, command):
         with open(log_file, "a") as f:
-            proc = subprocess.Popen(cmd,
+            proc = subprocess.Popen(command,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE,
                                     universal_newlines=True)
@@ -81,12 +79,10 @@ class GenerateMappingFile():
                 f.write(line)
             for line in iter(proc.stderr.readline, ''):
                 f.write(line)
-                print("%s%s%s" % (FAIL,
-                                  line,
-                                  END))
+                print("%s%s%s" % (FAIL, line, END))
 
-    def _log_to_console(self, cmd, log):
-        proc = subprocess.Popen(cmd,
+    def _log_to_console(self, command, log):
+        proc = subprocess.Popen(command,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
                                 universal_newlines=True)
@@ -97,15 +93,16 @@ class GenerateMappingFile():
 
     def _set_log(self, log_file, log_level):
         logger = logging.getLogger(PREFIX)
-        formatter = logging.Formatter(
-            '%(asctime)s %(levelname)s %(message)s')
+
         if log_file is not None and log_file != '':
+            formatter = logging.Formatter(
+                '%(asctime)s %(levelname)s %(message)s')
             hdlr = logging.FileHandler(log_file)
             hdlr.setFormatter(formatter)
-            logger.addHandler(hdlr)
         else:
-            ch = logging.StreamHandler(sys.stdout)
-            logger.addHandler(ch)
+            hdlr = logging.StreamHandler(sys.stdout)
+
+        logger.addHandler(hdlr)
         logger.setLevel(log_level)
         return logger
 
@@ -145,10 +142,10 @@ class GenerateMappingFile():
             dcs_service.list()
         except Exception as e:
             msg = "Connection to setup has failed. " \
-                  "Please check your cradentials: " \
-                  "\n URL: " + url \
-                  + "\n USER: " + username \
-                  + "\n CA file: " + ca
+                  "Please check your credentials: " \
+                  "\n URL: " + url + \
+                  "\n user: " + username + \
+                  "\n CA file: " + ca
             log.error(msg)
             print("%s%s%s%s" % (FAIL, PREFIX, msg, END))
             log.error("Error: %s", e)
@@ -157,41 +154,35 @@ class GenerateMappingFile():
             return False
         return True
 
-    def _validate_output_file_exists(self, fname, log):
-        _dir = os.path.dirname(fname)
+    def _validate_output_file_exists(self, output_file, log):
+        _dir = os.path.dirname(output_file)
         if _dir != '' and not os.path.exists(_dir):
-            log.warn("Path '%s' does not exists. Create folder",
-                     _dir)
+            log.warn("Path '%s' does not exist. Creating the directory.", _dir)
             os.makedirs(_dir)
-        if os.path.isfile(fname):
+        if os.path.isfile(output_file):
             valid = {"yes": True, "y": True, "ye": True,
                      "no": False, "n": False}
-            ans = input("%s%sThe output file '%s' "
-                        "already exists. "
+            ans = input("%s%sThe output file '%s' already exists. "
                         "Would you like to override it (y,n)?%s "
-                        % (WARN, PREFIX, fname, END))
+                        % (WARN, PREFIX, output_file, END))
             while True:
                 ans = ans.lower()
                 if ans in valid:
-                    if not valid[ans]:
-                        msg = "Failed to create output file. " \
-                              "File could not be overriden."
-                        log.error(msg)
-                        print("%s%s%s%s" % (FAIL, PREFIX, msg, END))
-                        sys.exit(0)
-                    break
-                else:
-                    ans = input("%s%sPlease respond with 'yes' or 'no': %s"
-                                % (INPUT, PREFIX, END))
+                    if valid[ans]:
+                        break
+                    msg = "Failed to create output file. " \
+                          "File could not be overridden."
+                    log.error(msg)
+                    print("%s%s%s%s" % (FAIL, PREFIX, msg, END))
+                    sys.exit(0)
+                ans = input("%s%sPlease respond with 'yes' or 'no': %s"
+                            % (INPUT, PREFIX, END))
             try:
-                os.remove(fname)
+                os.remove(output_file)
             except OSError:
-                log.error("File %s could not be replaced.", fname)
+                log.error("File %s could not be replaced.", output_file)
                 print("%s%sFile %s could not be replaced.%s"
-                      % (FAIL,
-                         PREFIX,
-                         fname,
-                         END))
+                      % (FAIL, PREFIX, output_file, END))
                 sys.exit(0)
 
     def _init_vars(self, conf_file, log):
@@ -201,13 +192,10 @@ class GenerateMappingFile():
         _USERNAME = 'username'
         _PASSWORD = 'password'
         _CA_FILE = 'ca_file'
-        # TODO: Must have full path, should add relative path
+        # TODO: Must have full path, should add relative path support.
         _OUTPUT_FILE = 'output_file'
         _ANSIBLE_PLAY = 'ansible_play'
 
-        """ Declare varialbles """
-        site, username, password, ca_file, output_file, ansible_play = '', \
-            '', '', '', '', ''
         settings = ConfigParser()
         settings.read(conf_file)
         if _SECTION not in settings.sections():
@@ -224,6 +212,7 @@ class GenerateMappingFile():
             settings.set(_SECTION, _OUTPUT_FILE, '')
         if not settings.has_option(_SECTION, _ANSIBLE_PLAY):
             settings.set(_SECTION, _ANSIBLE_PLAY, '')
+
         site = settings.get(_SECTION, _SITE,
                             vars=DefaultOption(settings,
                                                _SECTION,
@@ -254,18 +243,17 @@ class GenerateMappingFile():
                          % (INPUT, PREFIX, SITE_DEF, END)) or SITE_DEF
         if not username:
             username = input("%s%sUsername is not initialized. "
-                             "Please provide username (%s):%s "
+                             "Please provide the username (%s):%s "
                              % (INPUT, PREFIX, USERNAME_DEF, END)
                              ) or USERNAME_DEF
         while not password:
             password = input("%s%sPassword is not initialized. "
-                             "Please provide the password for "
-                             "username %s:%s "
+                             "Please provide the password for username %s:%s "
                              % (INPUT, PREFIX, username, END))
 
         while not ca_file:
-            ca_file = input("%s%sCa file is not initialized. "
-                            "Please provide the ca file location (%s):%s "
+            ca_file = input("%s%sCA file is not initialized. "
+                            "Please provide the CA file location (%s):%s "
                             % (INPUT, PREFIX, CA_DEF, END)) or CA_DEF
 
         while not output_file:
@@ -276,10 +264,9 @@ class GenerateMappingFile():
                                 ) or _OUTPUT_FILE
         self._validate_output_file_exists(output_file, log)
         while not ansible_play or not os.path.isfile(ansible_play):
-            ansible_play = input("%s%sAnsible play '%s' is not "
-                                 "initialized. Please provide the ansible "
-                                 "play to generate the mapping var file "
-                                 "(%s):%s "
+            ansible_play = input("%s%sAnsible play '%s' is not initialized. "
+                                 "Please provide the ansible play to generate "
+                                 "the mapping var file (%s):%s "
                                  % (INPUT, PREFIX, ansible_play, PLAY_DEF, END)
                                  ) or PLAY_DEF
         return site, username, password, ca_file, output_file, ansible_play
@@ -304,7 +291,6 @@ class DefaultOption(dict):
 
 
 if __name__ == "__main__":
-    level = logging.getLevelName("DEBUG")
-    conf = 'dr.conf'
-    log = '/tmp/ovirt-dr.log'
-    GenerateMappingFile().run(conf, log, level)
+    GenerateMappingFile().run(conf_file='dr.conf',
+                              log_file='/tmp/ovirt-dr.log',
+                              log_level=logging.getLevelName("DEBUG"))

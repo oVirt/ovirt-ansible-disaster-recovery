@@ -5,7 +5,7 @@
         dest: /tmp/{{ dr_report_file }}
 
     - name: Print report file
-      shell: cat /tmp/{{ dr_report_file }}
+      command: cat /tmp/{{ dr_report_file }}
       register: content
 
     - name: Pring report file to stdout

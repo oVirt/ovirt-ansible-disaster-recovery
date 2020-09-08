@@ -3,6 +3,7 @@
       template:
         src: report_log_template.j2
         dest: /tmp/{{ dr_report_file }}
+        mode: preserve
 
     - name: Print report file
       command: cat /tmp/{{ dr_report_file }}

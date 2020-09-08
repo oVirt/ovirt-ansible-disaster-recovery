@@ -42,10 +42,11 @@
       file:
         path: '{{ dr_running_vms }}'
         state: touch
+        mode: 0644
       when: not stat_result.stat.exists|bool or running_vms_fail_back is not defined
 
     - name: If no file exists which contains data of unregistered VMs, set the file with running VMs
-      copy: content="{{ res_ovirt_vms }}" dest={{ dr_running_vms }}
+      copy: content="{{ res_ovirt_vms }}" dest={{ dr_running_vms }} mode="preserve"
       when: running_vms_fail_back is not defined or (running_vms_fail_back is defined and running_vms_fail_back | length == 0)
 
   ignore_errors: "{{ dr_ignore_error_clean }}"

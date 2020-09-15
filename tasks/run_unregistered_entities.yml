@@ -7,7 +7,7 @@
           ca_file: "{{ vars['dr_sites_' + dr_target_host + '_ca_file'] }}"
 
     - name: Read file that contains running VMs from the previous setup
-      set_fact: running_vms_fail_back="{{ lookup('file', '{{ dr_running_vms }}') }}"
+      set_fact: running_vms_fail_back="{{ lookup('file', dr_running_vms) }}"
 
     - name: Remove dr_running_vms file after being used
       file:

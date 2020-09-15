@@ -17,6 +17,7 @@
       file:
           path: "/tmp/{{ dr_report_file }}"
           state: touch
+          mode: 0644
 
     - name: Init entity status list
       set_fact:

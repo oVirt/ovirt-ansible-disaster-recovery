@@ -9,7 +9,7 @@
         when: ovirt_hosts.0 is undefined
     - block:
       - name: Add storage domain if NFS
-        include_tasks: tasks/recover/add_nfs_domain.yml
+        include_tasks: add_nfs_domain.yml
         with_items:
           - "{{ storage }}"
         when: "storage.dr_domain_type == 'nfs'"
@@ -17,7 +17,7 @@
             loop_var: nfs_storage
 
       - name: Add storage domain if Gluster
-        include_tasks: tasks/recover/add_glusterfs_domain.yml
+        include_tasks: add_glusterfs_domain.yml
         with_items:
           - "{{ storage }}"
         when: "storage.dr_domain_type == 'glusterfs'"
@@ -25,7 +25,7 @@
             loop_var: gluster_storage
 
       - name: Add storage domain if Posix
-        include_tasks: tasks/recover/add_posixfs_domain.yml
+        include_tasks: add_posixfs_domain.yml
         with_items:
           - "{{ storage }}"
         when: "storage.dr_domain_type == 'posixfs'"
@@ -33,7 +33,7 @@
             loop_var: posix_storage
 
       - name: Add storage domain is scsi
-        include_tasks: tasks/recover/add_iscsi_domain.yml
+        include_tasks: add_iscsi_domain.yml
         with_items:
           - "{{ storage }}"
         when: "storage.dr_domain_type == 'iscsi'"
@@ -41,7 +41,7 @@
             loop_var: iscsi_storage
 
       - name: Add storage domain if fcp
-        include_tasks: tasks/recover/add_fcp_domain.yml
+        include_tasks: add_fcp_domain.yml
         with_items:
           - "{{ storage }}"
         when: "storage.dr_domain_type == 'fcp'"

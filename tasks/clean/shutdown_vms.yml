@@ -10,7 +10,7 @@
 
     # TODO: Add a wait until the VM is really down
     - name: Shutdown VMs
-      include_tasks: tasks/clean/shutdown_vm.yml
+      include_tasks: shutdown_vm.yml
       vars:
           vms: "{{ item }}"
       with_items: "{{ ovirt_vms }}"

@@ -7,7 +7,7 @@
           auth: "{{ ovirt_auth }}"
 
     - name: Register template
-      include: tasks/recover/register_template.yml
+      include: register_template.yml
       # The main task already declared ignore errors so that might bredundant to put it here
       # ignore_errors: "{{ ignore | default(yes) }}"
       with_items: "{{ ovirt_storage_templates }}"

@@ -11,7 +11,7 @@
           auth: "{{ ovirt_auth }}"
 
     - name: Remove valid storage domain
-      include_tasks: tasks/clean/remove_domain_process.yml
+      include_tasks: remove_domain_process.yml
       vars:
           sd: "{{ sd }}"
       with_items:

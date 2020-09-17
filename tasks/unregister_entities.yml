@@ -8,9 +8,10 @@
 
     # Get all the running VMs and shut them down
     - name: Fetch running VMs in the setup
-      ovirt_vm_facts:
+      ovirt_vm_info:
           pattern:  status = up
           auth: "{{ ovirt_auth }}"
+      register: vm_info
 
     - name: Check whether file with running VMs info exists
       stat:
@@ -35,7 +36,7 @@
                   'high_availability': item.high_availability
               }
           ] }}"
-      with_items: "{{ ovirt_vms }}"
+      with_items: "{{ vm_info.ovirt_vms }}"
       when: item.id is defined
 
     - name: Create file to obtain running vms if file does not exist

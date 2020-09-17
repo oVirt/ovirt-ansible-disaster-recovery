@@ -97,16 +97,17 @@
     # TODO: Document that behavior
     # Remove VMs only if there are no data storage domains left in the setup
     - name: Fetch leftover VMs in the setup
-      ovirt_vm_facts:
+      ovirt_vm_info:
           pattern: status = down
           auth: "{{ ovirt_auth }}"
+      register: vm_info
       when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0
 
     - name: Remove vms if no storage domains left in setup
       include_tasks: clean/remove_vms.yml
       vars:
           vm: "{{ item }}"
-      with_items: "{{ ovirt_vms }}"
+      with_items: "{{ vm_info.ovirt_vms }}"
       when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0
 
     # Remove direct LUN disks

@@ -112,16 +112,17 @@
 
     # Remove direct LUN disks
     - name: Fetch leftover direct LUN disks in the setup
-      ovirt_disk_facts:
+      ovirt_disk_info:
           pattern: disk_type = lun and number_of_vms =0
           auth: "{{ ovirt_auth }}"
+      register: disk_info
       when: dr_clean_orphaned_disks and ovirt_storage_domains | length == 0
 
     - name: Remove LUN disks if no storage domains left in setup
       include_tasks: clean/remove_disks.yml
       vars:
           disk: "{{ item }}"
-      with_items: "{{ ovirt_disks }}"
+      with_items: "{{ disk_info.ovirt_disks }}"
       when: dr_clean_orphaned_disks and ovirt_storage_domains | length == 0
 
 

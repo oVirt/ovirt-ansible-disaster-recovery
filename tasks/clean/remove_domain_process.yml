@@ -13,15 +13,17 @@
       when: sd.data_centers is not defined
 
     - name: Detached storage domain - Fetch active host for remove
-      ovirt_host_facts:
+      ovirt_host_info:
         pattern: "status=up"
         auth: "{{ ovirt_auth }}"
+      register: host_info
       when: sd.data_centers is not defined
 
     - name: Attached storage domain - Fetch active host for remove
-      ovirt_host_facts:
+      ovirt_host_info:
         pattern: "status=up and storage={{ sd.name }}"
         auth: "{{ ovirt_auth }}"
+      register: host_info
       when: sd.data_centers is defined
 
     # If sp_uuid is still initiated with the default boolean value,
@@ -33,8 +35,8 @@
     - name: Remove storage domain with no force
       include_tasks: remove_domain.yml
       vars:
-          host: "{{ ovirt_hosts[0].id }}"
-      when: "ovirt_hosts is defined and ovirt_hosts|length > 0 and not dr_force"
+          host: "{{ host_info.ovirt_hosts[0].id }}"
+      when: "host_info.ovirt_hosts is defined and host_info.ovirt_hosts|length > 0 and not dr_force"
 
     - name: Force remove storage domain
       include_tasks: remove_domain.yml

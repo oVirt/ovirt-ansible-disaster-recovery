@@ -33,8 +33,8 @@
     # TODO: We should add a validation task that will validate whether
     # all the hosts in the other site (primary or secondary) could not be connected
     # and also set a timer that will wait at least 180 seconds until the first
-    # attach will take place. We should do that to prevent sanlock failure with acquire
-    # lockspace. We should use a flag with default true whether to have thise check
+    # attach will take place. We should do that to prevent Sanlock failure with acquire
+    # lockspace. We should use a flag with default true whether to have this check
     # or not.
 
     # TODO: What happens if master is failed to be attached,
@@ -59,9 +59,10 @@
     # Get all the active storage domains in the setup to register
     # all the templates/VMs/Disks
     - name: Fetching active storage domains
-      ovirt_storage_domain_facts:
+      ovirt_storage_domain_info:
           pattern: "status=active"
           auth: "{{ ovirt_auth }}"
+      register: storage_domain_info
 
     - name: Set initial Maps
       set_fact:
@@ -169,16 +170,16 @@
       vars:
           storage: "{{ item }}"
       with_items:
-          - "{{ ovirt_storage_domains }}"
+          - "{{ storage_domain_info.ovirt_storage_domains }}"
 
-    # Register all the unregistered VMs after we registerd
+    # Register all the unregistered VMs after we registered
     # all the templates from the active storage domains fetched before.
     - name: Register VMs
       include_tasks: recover/register_vms.yml
       vars:
           storage: "{{ item }}"
       with_items:
-          - "{{ ovirt_storage_domains }}"
+          - "{{ storage_domain_info.ovirt_storage_domains }}"
 
     # Run all the high availability VMs.
     - name: Run highly available VMs

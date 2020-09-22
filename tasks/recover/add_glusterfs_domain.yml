@@ -7,7 +7,7 @@
           warning_low_space: "{{ gluster_storage['dr_warning_low_space'] }}"
           wipe_after_delete: "{{ gluster_storage['dr_wipe_after_delete'] }}"
           backup: "{{ gluster_storage['dr_backup'] }}"
-          host: "{{ ovirt_hosts[0].name }}"
+          host: "{{ host_info.ovirt_hosts[0].name }}"
           data_center: "{{ gluster_storage['dr_' + dr_target_host + '_dc_name'] }}"
           auth: "{{ ovirt_auth }}"
           glusterfs:

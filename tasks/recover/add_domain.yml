@@ -1,12 +1,13 @@
 - block:
     - name: Fetch available hosts in data center
-      ovirt_host_facts:
+      ovirt_host_info:
           pattern: "status=up and datacenter={{ storage['dr_' + dr_target_host + '_dc_name'] }}"
           auth: "{{ ovirt_auth }}"
+      register: host_info
     - block:
       - name: "Check for available hosts"
         fail: msg="No hosts available"
-        when: ovirt_hosts.0 is undefined
+        when: host_info.ovirt_hosts.0 is undefined
     - block:
       - name: Add storage domain if NFS
         include_tasks: add_nfs_domain.yml
@@ -47,7 +48,7 @@
         when: "storage.dr_domain_type == 'fcp'"
         loop_control:
             loop_var: fcp_storage
-      when: ovirt_hosts.0 is defined
+      when: host_info.ovirt_hosts.0 is defined
   ignore_errors: "{{ dr_ignore_error_recover }}"
   tags:
       - fail_over

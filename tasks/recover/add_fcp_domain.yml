@@ -9,7 +9,7 @@
           discard_after_delete: "{{ fcp_storage['dr_discard_after_delete'] }}"
           wipe_after_delete: "{{ fcp_storage['dr_wipe_after_delete'] }}"
           backup: "{{ fcp_storage['dr_backup'] }}"
-          host: "{{ ovirt_hosts[0].name }}"
+          host: "{{ host_info.ovirt_hosts[0].name }}"
           auth: "{{ ovirt_auth }}"
           data_center: "{{ fcp_storage['dr_' + dr_target_host + '_dc_name'] }}"
           fcp: {}

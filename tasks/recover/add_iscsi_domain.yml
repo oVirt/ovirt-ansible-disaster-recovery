@@ -5,7 +5,7 @@
       - name: Login to iSCSI targets
         ovirt_host:
             state: iscsilogin
-            name: "{{ ovirt_hosts[0].name }}"
+            name: "{{ host_info.ovirt_hosts[0].name }}"
             auth: "{{ ovirt_auth }}"
             iscsi:
                 username: "{{ iscsi_storage['dr_' + dr_target_host + '_username']|default('') }}"
@@ -24,7 +24,7 @@
             state: imported
             id: "{{ iscsi_storage['dr_domain_id'] }}"
             name: "{{ iscsi_storage['dr_' + dr_target_host + '_name']|default('') }}"
-            host: "{{ ovirt_hosts[0].name }}"
+            host: "{{ host_info.ovirt_hosts[0].name }}"
             auth: "{{ ovirt_auth }}"
             data_center: "{{ iscsi_storage['dr_' + dr_target_host + '_dc_name'] }}"
             critical_space_action_blocker: "{{ iscsi_storage['dr_critical_space_action_blocker'] }}"

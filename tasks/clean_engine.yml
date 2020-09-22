@@ -90,38 +90,41 @@
           loop_var: storage
 
     - name: Fetch leftover storage domains
-      ovirt_storage_domain_facts:
+      ovirt_storage_domain_info:
           pattern: type != glance
           auth: "{{ ovirt_auth }}"
+      register: storage_domain_info
 
     # TODO: Document that behavior
     # Remove VMs only if there are no data storage domains left in the setup
     - name: Fetch leftover VMs in the setup
-      ovirt_vm_facts:
+      ovirt_vm_info:
           pattern: status = down
           auth: "{{ ovirt_auth }}"
-      when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0
+      register: vm_info
+      when: dr_clean_orphaned_vms and storage_domain_info.ovirt_storage_domains | length == 0
 
     - name: Remove vms if no storage domains left in setup
       include_tasks: clean/remove_vms.yml
       vars:
           vm: "{{ item }}"
-      with_items: "{{ ovirt_vms }}"
-      when: dr_clean_orphaned_vms and ovirt_storage_domains | length == 0
+      with_items: "{{ vm_info.ovirt_vms }}"
+      when: dr_clean_orphaned_vms and storage_domain_info.ovirt_storage_domains | length == 0
 
     # Remove direct LUN disks
     - name: Fetch leftover direct LUN disks in the setup
-      ovirt_disk_facts:
+      ovirt_disk_info:
           pattern: disk_type = lun and number_of_vms =0
           auth: "{{ ovirt_auth }}"
-      when: dr_clean_orphaned_disks and ovirt_storage_domains | length == 0
+      register: disk_info
+      when: dr_clean_orphaned_disks and storage_domain_info.ovirt_storage_domains | length == 0
 
     - name: Remove LUN disks if no storage domains left in setup
       include_tasks: clean/remove_disks.yml
       vars:
           disk: "{{ item }}"
-      with_items: "{{ ovirt_disks }}"
-      when: dr_clean_orphaned_disks and ovirt_storage_domains | length == 0
+      with_items: "{{ disk_info.ovirt_disks }}"
+      when: dr_clean_orphaned_disks and storage_domain_info.ovirt_storage_domains | length == 0
 
 
   # Default value is set in role defaults

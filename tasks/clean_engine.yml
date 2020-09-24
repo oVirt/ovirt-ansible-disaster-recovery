@@ -8,8 +8,6 @@
 
     - name: Shutdown running VMs
       include_tasks: clean/shutdown_vms.yml
-      vars:
-          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -17,8 +15,6 @@
 
     - name: Update OVF_STORE disk for storage domains
       include_tasks: clean/update_ovf_store.yml
-      vars:
-          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -41,8 +37,6 @@
 
     - name: Remove non master storage domains with valid statuses
       include_tasks: clean/remove_valid_filtered_master_domains.yml
-      vars:
-          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -55,8 +49,6 @@
 
     - name: Remove non master storage domains with invalid statuses using force remove
       include_tasks: clean/remove_invalid_filtered_master_domains.yml
-      vars:
-          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -70,8 +62,6 @@
 
     - name: Remove master storage domains with valid statuses
       include_tasks: clean/remove_valid_filtered_master_domains.yml
-      vars:
-          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:
@@ -82,8 +72,6 @@
 
     - name: Remove master storage domains with invalid statuses using force remove
       include_tasks: clean/remove_invalid_filtered_master_domains.yml
-      vars:
-          storage: "{{ item }}"
       with_items:
           - "{{ dr_import_storages }}"
       loop_control:

@@ -36,8 +36,9 @@ def main(argv):
 def _init_vars(argv):
     url, username, password, ca, file_ = '', '', '', '', ''
     try:
-        opts, args = \
-            getopt.getopt(argv, "a:u:p:f:c:", ["a=", "u=", "p=", "f=", "c="])
+        opts, args = getopt.getopt(
+            argv,
+            "a:u:p:f:c:", ["a=", "u=", "p=", "f=", "c="])
     except getopt.GetoptError:
         print(
             '''
@@ -235,13 +236,11 @@ def _write_attached_storage_domains(f, dc_service, dc):
             continue
 
         f.write("- dr_domain_type: %s\n" % attached_sd.storage.type)
-        f.write("  dr_wipe_after_delete: %s\n"
-                % attached_sd.wipe_after_delete)
+        f.write("  dr_wipe_after_delete: %s\n" % attached_sd.wipe_after_delete)
         f.write("  dr_backup: %s\n" % attached_sd.backup)
         f.write("  dr_critical_space_action_blocker: %s\n"
                 % attached_sd.critical_space_action_blocker)
-        f.write("  dr_storage_domain_type: %s\n"
-                % attached_sd.type)
+        f.write("  dr_storage_domain_type: %s\n" % attached_sd.type)
         f.write("  dr_warning_low_space: %s\n"
                 % attached_sd.warning_low_space_indicator)
         f.write("  dr_primary_name: %s\n" % attached_sd.name)
@@ -265,13 +264,11 @@ def _write_attached_storage_domains(f, dc_service, dc):
                         attached_sd.storage.volume_group
                         .logical_units[0].address)
                 f.write("  dr_primary_port: %s\n" %
-                        attached_sd.storage.volume_group
-                        .logical_units[0].port)
+                        attached_sd.storage.volume_group.logical_units[0].port)
                 targets = set(lun_unit.target for lun_unit in
                               attached_sd.storage.volume_group.logical_units)
                 f.write("  dr_primary_target: [%s]\n" %
-                        ','.join(['"' + target + '"' for
-                                  target in targets]))
+                        ','.join(['"' + target + '"' for target in targets]))
                 _add_secondary_scsi(f, dc.name, attached_sd, targets)
             else:
                 _add_secondary_fcp(f, dc.name, attached_sd)
@@ -279,21 +276,18 @@ def _write_attached_storage_domains(f, dc_service, dc):
 
 
 def _add_secondary_mount(f, dc_name, attached):
-    f.write("  # Fill in the empty properties "
-            "related to the secondary site\n")
+    f.write("  # Fill in the empty properties related to the secondary site\n")
     f.write("  dr_secondary_name: # %s\n" % attached.name)
     f.write("  dr_secondary_master_domain: # %s\n" % attached.master)
     f.write("  dr_secondary_dc_name: # %s\n" % dc_name)
     f.write("  dr_secondary_path: # %s\n" % attached.storage.path)
     f.write("  dr_secondary_address: # %s\n" % attached.storage.address)
     if attached._storage.type == types.StorageType.POSIXFS:
-        f.write("  dr_secondary_vfs_type: # %s\n"
-                % attached.storage.vfs_type)
+        f.write("  dr_secondary_vfs_type: # %s\n" % attached.storage.vfs_type)
 
 
 def _add_secondary_scsi(f, dc_name, attached, targets):
-    f.write("  # Fill in the empty properties "
-            "related to the secondary site\n")
+    f.write("  # Fill in the empty properties related to the secondary site\n")
     f.write("  dr_secondary_name: # %s\n" % attached.name)
     f.write("  dr_secondary_master_domain: # %s\n" % attached.master)
     f.write("  dr_secondary_dc_name: # %s\n" % dc_name)
@@ -303,13 +297,11 @@ def _add_secondary_scsi(f, dc_name, attached, targets):
             .logical_units[0].port)
     f.write("  # target example: [\"target1\",\"target2\",\"target3\"]\n")
     f.write("  dr_secondary_target: # [%s]\n" %
-            ','.join(['"' + target + '"' for
-                      target in targets]))
+            ','.join(['"' + target + '"' for target in targets]))
 
 
 def _add_secondary_fcp(f, dc_name, attached):
-    f.write("  # Fill in the empty properties "
-            "related to the secondary site\n")
+    f.write("  # Fill in the empty properties related to the secondary site\n")
     f.write("  dr_secondary_name: # %s\n" % attached.name)
     f.write("  dr_secondary_master_domain: # %s\n" % attached.master)
     f.write("  dr_secondary_dc_name: # %s\n" % dc_name)

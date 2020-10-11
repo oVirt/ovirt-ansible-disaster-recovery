@@ -1,12 +1,11 @@
-from datetime import datetime
+#!/usr/bin/python3
 
-from ansible.plugins.callback import CallbackBase
-
-# Make coding more python3-ish, this is required for contributions to Ansible
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-# not only visible to ansible-doc, it also 'declares' the options the plugin
+from ansible.plugins.callback import CallbackBase
+
+# Not only visible to ansible-doc, it also 'declares' the options the plugin
 # requires and how to configure them.
 DOCUMENTATION = '''
   callback: stdout
@@ -20,7 +19,7 @@ DOCUMENTATION = '''
 
 class CallbackModule(CallbackBase):
     """
-    This callback module output the inforamtion with a specific style.
+    This callback module output the information with a specific style.
     """
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = 'aggregate'

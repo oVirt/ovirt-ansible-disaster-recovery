@@ -110,7 +110,7 @@ class FailOver:
                   "failover operation failed, please check log file for "
                   "further details.%s"
                   % (FAIL, e, END))
-            exit()
+            sys.exit()
 
     def _init_vars(self, conf_file):
         """ Declare constants """

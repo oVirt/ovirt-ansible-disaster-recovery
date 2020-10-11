@@ -4,7 +4,7 @@ import getopt
 import logging
 
 import ovirtsdk4 as sdk
-import ovirtsdk4.types as types
+import ovirtsdk4.types as otypes
 
 # TODO: log file location is currently in the same folder
 logging.basicConfig(level=logging.DEBUG, filename='generator.log')
@@ -146,7 +146,7 @@ def _get_external_lun_disks(connection):
     disks_service = connection.system_service().disks_service()
     disks_list = disks_service.list()
     for disk in disks_list:
-        if types.DiskStorageType.LUN == disk.storage_type:
+        if otypes.DiskStorageType.LUN == disk.storage_type:
             external_disks.append(disk)
     return external_disks
 
@@ -225,7 +225,7 @@ def _write_attached_storage_domains(f, dc_service, dc):
             f.write("#  dr_primary_dc_name: %s\n\n" % dc.name)
             continue
 
-        if attached_sd.type == types.StorageDomainType.EXPORT:
+        if attached_sd.type == otypes.StorageDomainType.EXPORT:
             f.write("# Export storage domain should not be part of the "
                     "recovery process!\n")
             f.write("# Please note that a data center with an export "
@@ -246,12 +246,12 @@ def _write_attached_storage_domains(f, dc_service, dc):
         f.write("  dr_primary_name: %s\n" % attached_sd.name)
         f.write("  dr_primary_master_domain: %s\n" % attached_sd.master)
         f.write("  dr_primary_dc_name: %s\n" % dc.name)
-        is_fcp = attached_sd._storage.type == types.StorageType.FCP
-        is_scsi = attached_sd.storage.type == types.StorageType.ISCSI
+        is_fcp = attached_sd._storage.type == otypes.StorageType.FCP
+        is_scsi = attached_sd.storage.type == otypes.StorageType.ISCSI
         if not is_fcp and not is_scsi:
             f.write("  dr_primary_path: %s\n" % attached_sd.storage.path)
             f.write("  dr_primary_address: %s\n" % attached_sd.storage.address)
-            if attached_sd._storage.type == types.StorageType.POSIXFS:
+            if attached_sd._storage.type == otypes.StorageType.POSIXFS:
                 f.write("  dr_primary_vfs_type: %s\n"
                         % attached_sd.storage.vfs_type)
             _add_secondary_mount(f, dc.name, attached_sd)
@@ -259,7 +259,7 @@ def _write_attached_storage_domains(f, dc_service, dc):
             f.write("  dr_discard_after_delete: %s\n"
                     % attached_sd.discard_after_delete)
             f.write("  dr_domain_id: %s\n" % attached_sd.id)
-            if attached_sd._storage._type == types.StorageType.ISCSI:
+            if attached_sd._storage._type == otypes.StorageType.ISCSI:
                 f.write("  dr_primary_address: %s\n" %
                         attached_sd.storage.volume_group
                         .logical_units[0].address)
@@ -282,7 +282,7 @@ def _add_secondary_mount(f, dc_name, attached):
     f.write("  dr_secondary_dc_name: # %s\n" % dc_name)
     f.write("  dr_secondary_path: # %s\n" % attached.storage.path)
     f.write("  dr_secondary_address: # %s\n" % attached.storage.address)
-    if attached._storage.type == types.StorageType.POSIXFS:
+    if attached._storage.type == otypes.StorageType.POSIXFS:
         f.write("  dr_secondary_vfs_type: # %s\n" % attached.storage.vfs_type)
 
 
@@ -391,7 +391,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
             disk_storage_type = host_storages.get(disk_id).type
             disk_storage = host_storages.get(disk_id).logical_units[0]
             f.write("  primary_storage_type: %s\n" % disk_storage_type)
-            if disk_storage_type == types.StorageType.ISCSI:
+            if disk_storage_type == otypes.StorageType.ISCSI:
                 portal = ''
                 if disk_storage.portal is not None:
                     splitted = disk_storage.portal.split(',')
@@ -421,7 +421,7 @@ def _write_external_lun_disks(f, external_disks, host_storages):
             )
         )
         f.write("  secondary_logical_unit_id: # %s\n" % disk_id)
-        if disk_storage_type == types.StorageType.ISCSI:
+        if disk_storage_type == otypes.StorageType.ISCSI:
             f.write("  secondary_logical_unit_address: # %s\n"
                     "  secondary_logical_unit_port: # %s\n"
                     "  secondary_logical_unit_portal: # \"%s\"\n"

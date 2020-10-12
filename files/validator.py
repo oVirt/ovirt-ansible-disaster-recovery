@@ -12,7 +12,7 @@ import ovirtsdk4.types as types
 
 from bcolors import bcolors
 from configparser import ConfigParser
-from six.moves import input
+from ansible.module_utils.six.moves import input
 
 
 INFO = bcolors.OKGREEN

@@ -21,7 +21,6 @@ PREFIX = "[Generate Mapping File] "
 CA_DEF = '/etc/pki/ovirt-engine/ca.pem'
 USERNAME_DEF = 'admin@internal'
 SITE_DEF = 'http://localhost:8080/ovirt-engine/api'
-VAR_DEF = "/var/lib/ovirt-ansible-disaster-recovery/mapping_vars.yml"
 PLAY_DEF = "../examples/dr_play.yml"
 
 

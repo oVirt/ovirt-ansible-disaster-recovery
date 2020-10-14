@@ -123,12 +123,10 @@ class ValidateMappingFile:
 
         # If no default location exists, get the location from the user.
         while not var_file:
-            var_file = input("%s%sVar file is not initialized. "
-                             "Please provide the location of the var file "
-                             "(%s):%s " % (WARN,
-                                           PREFIX,
-                                           self.def_var_file,
-                                           END) or self.def_var_file)
+            var_file = input("%s%sVar file is not initialized. Please provide "
+                             "the location of the var file (%s):%s " %
+                             (WARN, PREFIX, self.def_var_file, END)
+                             ) or self.def_var_file
 
         self.var_file = var_file
 

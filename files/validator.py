@@ -37,8 +37,7 @@ class ValidateMappingFile:
               "for oVirt ansible disaster recovery%s"
               % (INFO, PREFIX, END))
         self._set_dr_conf_variables(conf_file)
-        print("%s%sVar File: '%s'%s"
-              % (INFO, PREFIX, self.var_file, END))
+        print("%s%sVar File: '%s'%s" % (INFO, PREFIX, self.var_file, END))
         while not os.path.isfile(self.var_file):
             self.var_file = input(
                 "%s%sVar file '%s' does not exists. "
@@ -82,11 +81,7 @@ class ValidateMappingFile:
         if not isinstance(map_file, list) and map_file is not None:
             print("%s%s%s is not a list: '%s'."
                   " Please check your mapping file%s"
-                  % (FAIL,
-                     PREFIX,
-                     mapping,
-                     map_file,
-                     END))
+                  % (FAIL, PREFIX, mapping, map_file, END))
             return False
         return True
 
@@ -172,7 +167,7 @@ class ValidateMappingFile:
                     second_conn,
                     cluster_mapping)
             finally:
-                # Close the connections
+                # Close the connections.
                 if primary_conn:
                     primary_conn.close()
                 if second_conn:
@@ -233,7 +228,7 @@ class ValidateMappingFile:
                     self._fetch_affinity_groups(cluster_service))
         aff_labels = self._get_affinity_labels(conn)
         aaa_domains = self._get_aaa_domains(conn)
-        # TODO: Remove once vnic prifle is validated.
+        # TODO: Remove once vnic profile is validated.
         networks = self._get_vnic_profile_mapping(conn)
         isValid = self._validate_networks(
             python_vars,
@@ -365,7 +360,7 @@ class ValidateMappingFile:
         for x in _mapping:
             if key_setup not in x.keys():
                 print(
-                    "%s%sdictionary key '%s' is not include in %s[%s].%s" %
+                    "%s%sdictionary key '%s' is not included in %s[%s].%s" %
                     (FAIL,
                      PREFIX,
                      key_setup,
@@ -391,11 +386,7 @@ class ValidateMappingFile:
             print(
                 "%s%sFinished validation for '%s' for key name "
                 "'%s' with success.%s" %
-                (INFO,
-                 PREFIX,
-                 key,
-                 key_setup,
-                 END))
+                (INFO, PREFIX, key, key_setup, END))
         return isValid
 
     def _validate_hosted_engine(self, var_file):
@@ -425,24 +416,25 @@ class ValidateMappingFile:
         clusters = 'clusters'
         domains = 'domains'
         roles = 'roles'
-        aff_group = 'aff_groups'
-        aff_label = 'aff_labels'
+        aff_groups = 'aff_groups'
+        aff_labels = 'aff_labels'
         network = 'network'
         key1 = 'primary_name'
         key2 = 'secondary_name'
+        dr_primary_name = 'dr_primary_name'
+        dr_secondary_name = 'dr_secondary_name'
 
         duplicates = self._get_dups(
             var_file, [
                 [clusters, self.cluster_map, key1, key2],
-                [domains, self.domain_map, 'dr_primary_name',
-                 'dr_secondary_name'],
+                [domains, self.domain_map, dr_primary_name, dr_secondary_name],
                 [roles, self.role_map, key1, key2],
-                [aff_group, self.aff_group_map, key1, key2],
-                [aff_label, self.aff_label_map, key1, key2]])
+                [aff_groups, self.aff_group_map, key1, key2],
+                [aff_labels, self.aff_label_map, key1, key2]])
         duplicates[network] = self._get_dup_network(var_file)
         isValid = (not self._print_duplicate_keys(
-            duplicates, [clusters, domains, roles, aff_group,
-                         aff_label, network])) and isValid
+            duplicates, [clusters, domains, roles, aff_groups,
+                         aff_labels, network])) and isValid
         return isValid
 
     def _validate_vms_for_failback(self, setup_conn, setup_type):
@@ -461,21 +453,13 @@ class ValidateMappingFile:
             print("%s%sFailback process does not support VMs in preview."
                   " The '%s' setup contains the following previewed vms:"
                   " '%s'%s"
-                  % (FAIL,
-                     PREFIX,
-                     setup_type,
-                     vms_in_preview,
-                     END))
+                  % (FAIL, PREFIX, setup_type, vms_in_preview, END))
             return False
         if len(vms_delete_protected) > 0:
             print("%s%sFailback process does not support delete protected"
                   " VMs. The '%s' setup contains the following vms:"
                   " '%s'%s"
-                  % (FAIL,
-                     PREFIX,
-                     setup_type,
-                     vms_delete_protected,
-                     END))
+                  % (FAIL, PREFIX, setup_type, vms_delete_protected, END))
             return False
         return True
 

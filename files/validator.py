@@ -135,12 +135,11 @@ class ValidateMappingFile:
         return ret_val
 
     def _entity_validator(self, python_vars):
-        isValid = True
         ovirt_setups = ConnectSDK(
             python_vars,
             self.primary_pwd,
             self.second_pwd)
-        isValid = ovirt_setups.validate_primary() and isValid
+        isValid = ovirt_setups.validate_primary()
         isValid = ovirt_setups.validate_secondary() and isValid
         if isValid:
             primary_conn, second_conn = '', ''
@@ -212,7 +211,6 @@ class ValidateMappingFile:
         return True
 
     def _validate_entities_in_setup(self, conn, setup, python_vars):
-        isValid = True
         dcs_service = conn.system_service().data_centers_service()
         dcs_list = dcs_service.list()
         clusters = []
@@ -233,7 +231,7 @@ class ValidateMappingFile:
         isValid = self._validate_networks(
             python_vars,
             networks,
-            setup) and isValid
+            setup)
         isValid = self._validate_entity_exists(
             clusters,
             python_vars,
@@ -412,7 +410,6 @@ class ValidateMappingFile:
         return True
 
     def _validate_duplicate_keys(self, var_file):
-        isValid = True
         clusters = 'clusters'
         domains = 'domains'
         roles = 'roles'
@@ -432,10 +429,9 @@ class ValidateMappingFile:
                 [aff_groups, self.aff_group_map, key1, key2],
                 [aff_labels, self.aff_label_map, key1, key2]])
         duplicates[network] = self._get_dup_network(var_file)
-        isValid = (not self._print_duplicate_keys(
-            duplicates, [clusters, domains, roles, aff_groups,
-                         aff_labels, network])) and isValid
-        return isValid
+        return not self._print_duplicate_keys(
+            duplicates,
+            [clusters, domains, roles, aff_groups, aff_labels, network])
 
     def _validate_vms_for_failback(self, setup_conn, setup_type):
         vms_in_preview = []

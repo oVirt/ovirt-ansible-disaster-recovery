@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import logging
 import os.path
 import subprocess
@@ -7,7 +11,7 @@ import sys
 import time
 
 from configparser import ConfigParser
-from six.moves import input
+from ansible.module_utils.six.moves import input
 
 from bcolors import bcolors
 
@@ -74,7 +78,7 @@ class FailBack:
         vault_pass = input(INPUT + PREFIX + vault_pass_msg + END)
         os.system("export vault_password=\"" + vault_pass + "\"")
 
-        info_msg = ("Starting cleanup process of setup '{}' for "
+        info_msg = ("Starting cleanup process of setup '{0}' for "
                     "oVirt ansible disaster recovery".format(target_host))
         log.info(info_msg)
         print("\n%s%s%s%s" % (INFO, PREFIX, info_msg, END))
@@ -86,13 +90,13 @@ class FailBack:
         else:
             self._log_to_console(command_cleanup, log)
 
-        info_msg = ("Finished cleanup of setup '{}' "
+        info_msg = ("Finished cleanup of setup '{0}' "
                     "for oVirt ansible disaster recovery".format(source_map))
         log.info(info_msg)
         print("\n%s%s%s%s" % (INFO, PREFIX, info_msg, END))
 
-        info_msg = ("Starting failback process to setup '{}' from setup '{}' "
-                    "for oVirt ansible disaster recovery"
+        info_msg = ("Starting failback process to setup '{0}' "
+                    "from setup '{1}' for oVirt ansible disaster recovery"
                     .format(target_host, source_map))
         log.info(info_msg)
         print("\n%s%s%s%s" % (INFO, PREFIX, info_msg, END))
@@ -147,7 +151,7 @@ class FailBack:
                   "failback operation failed, please check log file for "
                   "further details.%s"
                   % (FAIL, e, END))
-            exit()
+            sys.exit()
 
     def _init_vars(self, conf_file):
         """ Declare constants """

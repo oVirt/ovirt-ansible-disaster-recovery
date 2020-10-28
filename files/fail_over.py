@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import logging
 import os.path
 import subprocess
@@ -7,7 +11,7 @@ import sys
 import time
 
 from configparser import ConfigParser
-from six.moves import input
+from ansible.module_utils.six.moves import input
 
 from bcolors import bcolors
 
@@ -106,7 +110,7 @@ class FailOver:
                   "failover operation failed, please check log file for "
                   "further details.%s"
                   % (FAIL, e, END))
-            exit()
+            sys.exit()
 
     def _init_vars(self, conf_file):
         """ Declare constants """

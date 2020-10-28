@@ -1,5 +1,10 @@
 #!/usr/bin/python3
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import os
+import sys
 import yaml
 
 import ovirtsdk4 as sdk
@@ -7,7 +12,7 @@ import ovirtsdk4.types as types
 
 from bcolors import bcolors
 from configparser import ConfigParser
-from six.moves import input
+from ansible.module_utils.six.moves import input
 
 
 INFO = bcolors.OKGREEN
@@ -57,15 +62,15 @@ class ValidateMappingFile:
                 or not self._entity_validator(python_vars)
                 or not self._validate_failback_leftovers()):
             self._print_finish_error()
-            exit()
+            sys.exit()
 
         if not self._validate_hosted_engine(python_vars):
             self._print_finish_error()
-            exit()
+            sys.exit()
 
         if not self._validate_export_domain(python_vars):
             self._print_finish_error()
-            exit()
+            sys.exit()
         self._print_finish_success()
 
     def _validate_lists_in_mapping_file(self, mapping_vars):
@@ -538,7 +543,7 @@ class ValidateMappingFile:
                          x[key1_a],
                          x[key1_b],
                          END))
-                exit()
+                sys.exit()
             primary_dc_name = ''
             if key1_c in x:
                 primary_dc_name = x[key1_c]
@@ -565,7 +570,7 @@ class ValidateMappingFile:
                          val1_b,
                          x[val1_b],
                          END))
-                exit()
+                sys.exit()
             secondary_dc_name = ''
             if val1_c in x:
                 secondary_dc_name = x[val1_c]

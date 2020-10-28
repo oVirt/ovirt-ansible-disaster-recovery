@@ -1,11 +1,15 @@
 #!/usr/bin/python3
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import logging
 import os.path
 import subprocess
 import sys
 
 from configparser import ConfigParser
-from six.moves import input
+from ansible.module_utils.six.moves import input
 
 import ovirtsdk4 as sdk
 
@@ -46,8 +50,8 @@ class GenerateMappingFile:
                                          password,
                                          ca_file):
             self._print_error(log)
-            exit()
-        extra_vars = "site={} username={} password={} ca={} var_file={}".\
+            sys.exit()
+        extra_vars = "site={0} username={1} password={2} ca={3} var_file={4}".\
             format(site, username, password, ca_file, var_file_path)
         command = [
             "ansible-playbook", ansible_play,
@@ -64,7 +68,7 @@ class GenerateMappingFile:
         if not os.path.isfile(var_file_path):
             log.error("Can not find output file in '%s'.", var_file_path)
             self._print_error(log)
-            exit()
+            sys.exit()
         log.info("Var file location: '%s'", var_file_path)
         self._print_success(log)
 

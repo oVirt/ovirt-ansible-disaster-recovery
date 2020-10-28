@@ -1,6 +1,8 @@
 oVirt Disaster Recovery
 =========
 
+## This role has been migrated to [oVirt Ansible Collection](https://github.com/ovirt/ovirt-ansible-collection), please use latest version from there. This repository is now readonly and no longer used for active development.
+
 The `oVirt.disaster-recovery` role responsible to manage the disaster recovery scenarios in oVirt.
 
 Requirements
